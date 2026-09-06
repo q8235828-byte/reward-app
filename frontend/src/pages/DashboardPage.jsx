@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { formatCurrency } from '../utils/format';
+import {
+  DepositIcon, WithdrawIcon, PlansIcon, ReferralIcon, TransactionsIcon,
+} from '../components/icons';
 
 export default function DashboardPage() {
   const [wallet, setWallet] = useState(null);
@@ -51,11 +54,11 @@ export default function DashboardPage() {
       </section>
 
       <nav className="quick-actions">
-        <Link to="/deposit" className="action-button">Deposit</Link>
-        <Link to="/withdraw" className="action-button">Withdraw</Link>
-        <Link to="/plans" className="action-button">Plans</Link>
-        <Link to="/referral" className="action-button">Referral</Link>
-        <Link to="/transactions" className="action-button">Transactions</Link>
+        <Link to="/deposit" className="action-button"><DepositIcon size={18} />Deposit</Link>
+        <Link to="/withdraw" className="action-button"><WithdrawIcon size={18} />Withdraw</Link>
+        <Link to="/plans" className="action-button"><PlansIcon size={18} />Plans</Link>
+        <Link to="/referral" className="action-button"><ReferralIcon size={18} />Referral</Link>
+        <Link to="/transactions" className="action-button"><TransactionsIcon size={18} />Transactions</Link>
       </nav>
     </div>
   );

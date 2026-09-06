@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { ShieldIcon, LogoutIcon } from './icons';
 
 const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
 
@@ -18,10 +19,16 @@ export default function AppLayout() {
         <Link to="/" className="app-title">Rewards</Link>
         <div className="app-header-right">
           {user && ADMIN_ROLES.includes(user.role) && (
-            <Link to="/admin" className="link-button">Admin panel</Link>
+            <Link to="/admin" className="link-button">
+              <ShieldIcon size={15} />
+              Admin panel
+            </Link>
           )}
           <span className="app-user-name">{user?.fullName}</span>
-          <button type="button" className="link-button" onClick={handleLogout}>Log out</button>
+          <button type="button" className="link-button" onClick={handleLogout}>
+            <LogoutIcon size={15} />
+            Log out
+          </button>
         </div>
       </header>
       <main className="app-main">

@@ -1,17 +1,21 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import {
+  HomeIcon, UsersIcon, DepositIcon, WithdrawIcon, PlansIcon,
+  ReferralIcon, GiftIcon, TransactionsIcon, SettingsIcon, AuditIcon, LogoutIcon,
+} from './icons';
 
 const NAV_ITEMS = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/users', label: 'Users' },
-  { to: '/admin/deposits', label: 'Deposits' },
-  { to: '/admin/withdrawals', label: 'Withdrawals' },
-  { to: '/admin/plans', label: 'Plans' },
-  { to: '/admin/referrals', label: 'Referrals' },
-  { to: '/admin/rewards', label: 'Rewards' },
-  { to: '/admin/transactions', label: 'Transactions' },
-  { to: '/admin/settings', label: 'Settings' },
-  { to: '/admin/audit-logs', label: 'Audit Logs' },
+  { to: '/admin', label: 'Dashboard', end: true, icon: HomeIcon },
+  { to: '/admin/users', label: 'Users', icon: UsersIcon },
+  { to: '/admin/deposits', label: 'Deposits', icon: DepositIcon },
+  { to: '/admin/withdrawals', label: 'Withdrawals', icon: WithdrawIcon },
+  { to: '/admin/plans', label: 'Plans', icon: PlansIcon },
+  { to: '/admin/referrals', label: 'Referrals', icon: ReferralIcon },
+  { to: '/admin/rewards', label: 'Rewards', icon: GiftIcon },
+  { to: '/admin/transactions', label: 'Transactions', icon: TransactionsIcon },
+  { to: '/admin/settings', label: 'Settings', icon: SettingsIcon },
+  { to: '/admin/audit-logs', label: 'Audit Logs', icon: AuditIcon },
 ];
 
 export default function AdminLayout() {
@@ -30,21 +34,28 @@ export default function AdminLayout() {
         <div className="app-header-right">
           <Link to="/" className="link-button">User view</Link>
           <span className="app-user-name">{user?.fullName}</span>
-          <button type="button" className="link-button" onClick={handleLogout}>Log out</button>
+          <button type="button" className="link-button" onClick={handleLogout}>
+            <LogoutIcon size={15} />
+            Log out
+          </button>
         </div>
       </header>
       <div className="admin-body">
         <nav className="admin-nav">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const ItemIcon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}
+              >
+                <ItemIcon size={17} />
+                {item.label}
+              </NavLink>
+            );
+          })}
         </nav>
         <main className="admin-main">
           <Outlet />
