@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 import { formatCurrency } from '../../utils/format';
+import {
+  UsersIcon, DepositIcon, WithdrawIcon, GiftIcon, ReferralIcon, ShieldIcon,
+} from '../../components/icons';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
@@ -17,20 +20,56 @@ export default function AdminDashboardPage() {
   if (loading) return <p>Loading…</p>;
   if (error) return <p className="form-error">{error}</p>;
 
+  const cards = [
+    {
+      icon: UsersIcon, color: 'teal',
+      label: 'Total users', value: stats.totalUsers, sub: `${stats.activeUsers} active`,
+    },
+    {
+      icon: DepositIcon, color: 'blue',
+      label: 'Total deposits', value: formatCurrency(stats.totalDeposits), sub: `${stats.approvedDeposits} approved`,
+    },
+    {
+      icon: WithdrawIcon, color: 'amber',
+      label: 'Total withdrawals', value: formatCurrency(stats.totalWithdrawals), sub: `${stats.paidWithdrawals} paid`,
+    },
+    {
+      icon: ShieldIcon, color: 'rose',
+      label: 'Pending deposits', value: stats.pendingDeposits, sub: 'awaiting review',
+    },
+    {
+      icon: ShieldIcon, color: 'rose',
+      label: 'Pending withdrawals', value: stats.pendingWithdrawals, sub: 'awaiting review',
+    },
+    {
+      icon: GiftIcon, color: 'violet',
+      label: 'Total rewards paid', value: formatCurrency(stats.totalRewards), sub: 'daily reward engine',
+    },
+    {
+      icon: ReferralIcon, color: 'emerald',
+      label: 'Referral commissions', value: formatCurrency(stats.totalReferralCommissions), sub: 'paid to referrers',
+    },
+  ];
+
   return (
     <div>
       <h1>Dashboard</h1>
-      <section className="stat-grid admin-stat-grid">
-        <div className="stat-tile"><span className="stat-label">Total users</span><span className="stat-value">{stats.totalUsers}</span></div>
-        <div className="stat-tile"><span className="stat-label">Active users</span><span className="stat-value">{stats.activeUsers}</span></div>
-        <div className="stat-tile"><span className="stat-label">Total deposits</span><span className="stat-value">{formatCurrency(stats.totalDeposits)}</span></div>
-        <div className="stat-tile"><span className="stat-label">Pending deposits</span><span className="stat-value">{stats.pendingDeposits}</span></div>
-        <div className="stat-tile"><span className="stat-label">Approved deposits</span><span className="stat-value">{stats.approvedDeposits}</span></div>
-        <div className="stat-tile"><span className="stat-label">Total withdrawals</span><span className="stat-value">{formatCurrency(stats.totalWithdrawals)}</span></div>
-        <div className="stat-tile"><span className="stat-label">Pending withdrawals</span><span className="stat-value">{stats.pendingWithdrawals}</span></div>
-        <div className="stat-tile"><span className="stat-label">Paid withdrawals</span><span className="stat-value">{stats.paidWithdrawals}</span></div>
-        <div className="stat-tile"><span className="stat-label">Total rewards paid</span><span className="stat-value">{formatCurrency(stats.totalRewards)}</span></div>
-        <div className="stat-tile"><span className="stat-label">Total referral commissions</span><span className="stat-value">{formatCurrency(stats.totalReferralCommissions)}</span></div>
+      <section className="stat-card-grid">
+        {cards.map((card) => {
+          const CardIcon = card.icon;
+          return (
+            <div className="stat-card" key={card.label}>
+              <span className={`stat-card-icon stat-card-icon-${card.color}`}>
+                <CardIcon size={19} />
+              </span>
+              <div className="stat-card-body">
+                <span className="stat-card-label">{card.label}</span>
+                <span className="stat-card-value">{card.value}</span>
+                <span className="stat-card-sub">{card.sub}</span>
+              </div>
+            </div>
+          );
+        })}
       </section>
     </div>
   );
