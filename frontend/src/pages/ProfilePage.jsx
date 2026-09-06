@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
 import { formatDate } from '../utils/format';
 import PasswordInput from '../components/PasswordInput';
+import VerifyField from '../components/VerifyField';
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -57,6 +58,24 @@ export default function ProfilePage() {
           <div><dt>Status</dt><dd><span className={`status-badge status-${user.status.toLowerCase()}`}>{user.status}</span></dd></div>
           <div><dt>Member since</dt><dd>{formatDate(user.createdAt)}</dd></div>
         </dl>
+      </section>
+
+      <section className="admin-card">
+        <h2>Verification</h2>
+        <div className="verify-field-list">
+          <VerifyField
+            channel="email"
+            verified={Boolean(user.emailVerifiedAt)}
+            destination={user.email}
+            onVerified={refreshUser}
+          />
+          <VerifyField
+            channel="phone"
+            verified={Boolean(user.phoneVerifiedAt)}
+            destination={user.phone}
+            onVerified={refreshUser}
+          />
+        </div>
       </section>
 
       <form className="card-form" onSubmit={handleSubmit}>

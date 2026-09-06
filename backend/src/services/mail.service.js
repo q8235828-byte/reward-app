@@ -11,7 +11,7 @@ if (env.mail.host) {
     auth: env.mail.user ? { user: env.mail.user, pass: env.mail.password } : undefined,
   });
 } else if (env.nodeEnv === 'production') {
-  console.warn('SMTP is not configured. Password reset emails will not be delivered.');
+  console.warn('SMTP is not configured. Password reset and verification emails will not be delivered.');
 }
 
 async function sendPasswordResetEmail(to, resetUrl) {
@@ -29,4 +29,19 @@ async function sendPasswordResetEmail(to, resetUrl) {
   });
 }
 
-module.exports = { sendPasswordResetEmail };
+async function sendVerificationCodeEmail(to, code, expiryMinutes) {
+  if (!transporter) {
+    console.log(`[DEV] Email verification code for ${to}: ${code}`);
+    return;
+  }
+
+  await transporter.sendMail({
+    from: env.mail.from,
+    to,
+    subject: 'Verify your email',
+    text: `Your verification code is ${code}. It expires in ${expiryMinutes} minutes.`,
+    html: `<p>Your verification code is:</p><p style="font-size:24px;font-weight:700;letter-spacing:4px;">${code}</p><p>It expires in ${expiryMinutes} minutes.</p>`,
+  });
+}
+
+module.exports = { sendPasswordResetEmail, sendVerificationCodeEmail };

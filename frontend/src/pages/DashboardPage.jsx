@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/format';
 import {
   DepositIcon, WithdrawIcon, PlansIcon, ReferralIcon, TransactionsIcon,
 } from '../components/icons';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const needsVerification = user && (!user.emailVerifiedAt || !user.phoneVerifiedAt);
 
   useEffect(() => {
     let active = true;
@@ -25,6 +28,12 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard">
+      {needsVerification && (
+        <Link to="/profile" className="verify-banner">
+          Verify your email and phone number to secure your account →
+        </Link>
+      )}
+
       <section className="balance-card">
         <span className="balance-label">Available to withdraw</span>
         <span className="balance-amount">{formatCurrency(wallet.withdrawableBalance)}</span>

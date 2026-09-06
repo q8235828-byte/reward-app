@@ -747,6 +747,18 @@ select {
   margin: -0.5rem 0 1rem;
 }
 
+.verify-banner {
+  display: block;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+}
+
 .eligibility-notice {
   display: flex;
   align-items: center;
@@ -1694,6 +1706,87 @@ select {
   color: var(--color-muted);
   font-size: 0.78rem;
   font-weight: 500;
+}
+
+.verify-field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.verify-field {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.verify-field-row,
+.verify-field-done {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.87rem;
+  font-weight: 600;
+}
+
+.verify-field > button {
+  align-self: flex-start;
+  border: none;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.83rem;
+}
+
+.verify-field > button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verify-code-form {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.verify-code-form input {
+  width: 130px;
+  padding: 0.55rem 0.7rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+.verify-code-form input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+
+.verify-code-form button[type='submit'] {
+  border: none;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+  font-size: 0.83rem;
+}
+
+.verify-code-form button[type='submit']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .setting-description {

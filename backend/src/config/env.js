@@ -56,6 +56,21 @@ module.exports = {
   cron: {
     secret: getEnv('CRON_SECRET'),
   },
+  verification: {
+    codeExpiryMinutes: Number(getEnv('VERIFICATION_CODE_EXPIRY_MINUTES', 10)),
+    resendCooldownSeconds: Number(getEnv('VERIFICATION_RESEND_COOLDOWN_SECONDS', 60)),
+    maxAttempts: Number(getEnv('VERIFICATION_MAX_ATTEMPTS', 5)),
+  },
+  sms: {
+    // No SMS gateway is wired up out of the box - there's nowhere for
+    // real credentials to come from without the user picking a provider
+    // (Twilio, a local Pakistani gateway, etc). If these are unset,
+    // sms.service.js logs the code to the console instead of pretending
+    // to send it, same pattern as mail.service.js when SMTP is unset.
+    apiUrl: getEnv('SMS_API_URL'),
+    apiKey: getEnv('SMS_API_KEY'),
+    senderId: getEnv('SMS_SENDER_ID'),
+  },
   payments: {
     // Manual verification account details (where users are told to send
     // money). Left unset until an admin configures them.

@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
   referred_by BIGINT UNSIGNED DEFAULT NULL,
   role ENUM('USER','ADMIN','SUPER_ADMIN') NOT NULL DEFAULT 'USER',
   status ENUM('ACTIVE','SUSPENDED','BLOCKED','PENDING') NOT NULL DEFAULT 'PENDING',
+  email_verified_at DATETIME DEFAULT NULL,
+  phone_verified_at DATETIME DEFAULT NULL,
   last_login DATETIME DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -48,6 +50,26 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   UNIQUE KEY uq_password_reset_tokens_hash (token_hash),
   KEY idx_password_reset_tokens_user (user_id),
   CONSTRAINT fk_password_reset_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- verification_codes
+-- Short numeric OTP codes for email/phone verification. code_hash stores
+-- SHA-256 of the code - like password_reset_tokens, the raw code is never
+-- persisted. attempts caps brute-force guessing of a 6-digit code.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS verification_codes (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  channel ENUM('EMAIL','PHONE') NOT NULL,
+  code_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME DEFAULT NULL,
+  attempts INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_verification_codes_user_channel (user_id, channel),
+  CONSTRAINT fk_verification_codes_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------

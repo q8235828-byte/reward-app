@@ -91,6 +91,14 @@ async function incrementTokenVersion(conn, userId) {
   await conn.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [userId]);
 }
 
+async function markEmailVerified(conn, userId) {
+  await conn.query('UPDATE users SET email_verified_at = NOW() WHERE id = ?', [userId]);
+}
+
+async function markPhoneVerified(conn, userId) {
+  await conn.query('UPDATE users SET phone_verified_at = NOW() WHERE id = ?', [userId]);
+}
+
 function sanitizeUser(row) {
   if (!row) return null;
   return {
@@ -102,6 +110,8 @@ function sanitizeUser(row) {
     referredBy: row.referred_by,
     role: row.role,
     status: row.status,
+    emailVerifiedAt: row.email_verified_at,
+    phoneVerifiedAt: row.phone_verified_at,
     lastLogin: row.last_login,
     createdAt: row.created_at,
   };
@@ -121,5 +131,7 @@ module.exports = {
   updateLastLogin,
   updatePasswordHash,
   incrementTokenVersion,
+  markEmailVerified,
+  markPhoneVerified,
   sanitizeUser,
 };
