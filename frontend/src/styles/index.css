@@ -1240,6 +1240,175 @@ select {
   font-size: 0.78rem;
 }
 
+/* --- Site footer (public pages only) --- */
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 2.4rem 0 1.6rem;
+  margin-top: 1rem;
+}
+
+.site-footer-columns {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 1.5rem;
+  padding-bottom: 1.8rem;
+}
+
+.site-footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.site-footer-column .app-title {
+  margin-bottom: 0.2rem;
+}
+
+.site-footer-column p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.site-footer-column h4 {
+  margin: 0 0 0.15rem;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.site-footer-column a {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-soft);
+}
+
+.site-footer-column a:hover {
+  color: var(--color-primary);
+}
+
+.site-footer-bottom {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.2rem;
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* --- Static info pages (About/Contact/Company/Terms/Privacy/FAQ) --- */
+
+.info-page {
+  padding: 2.5rem 0 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.info-page h1 {
+  font-size: 1.8rem;
+}
+
+.info-page h2 {
+  font-size: 1.05rem;
+  margin-top: 1.8rem;
+}
+
+.info-page p {
+  color: var(--color-text-soft);
+  line-height: 1.65;
+  font-size: 0.94rem;
+}
+
+.info-page a {
+  font-weight: 600;
+}
+
+.info-lede {
+  font-size: 1.02rem !important;
+  color: var(--color-muted) !important;
+}
+
+.info-legal-notice {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem !important;
+  font-weight: 500;
+}
+
+.info-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin: 1.2rem 0;
+}
+
+.info-detail-list {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 0;
+}
+
+.info-note {
+  font-size: 0.85rem !important;
+  color: var(--color-muted) !important;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+
+.faq-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.94rem;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::before {
+  content: '+';
+  display: inline-block;
+  width: 1.2rem;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.faq-item[open] summary::before {
+  content: '−';
+}
+
+.faq-item p {
+  margin: 0.7rem 0 0 1.2rem;
+}
+
+@media (max-width: 720px) {
+  .site-footer-columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 860px) {
   .landing-steps,
   .landing-plan-list,

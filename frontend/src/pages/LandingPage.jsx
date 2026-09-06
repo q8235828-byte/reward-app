@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { formatCurrency } from '../utils/format';
+import PublicHeader from '../components/PublicHeader';
+import Footer from '../components/Footer';
 import {
   DepositIcon, GiftIcon, ReferralIcon, ShieldIcon, WithdrawIcon, PlansIcon,
 } from '../components/icons';
@@ -22,13 +24,7 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      <header className="landing-header">
-        <span className="app-title">Rewards</span>
-        <div className="landing-header-actions">
-          <Link to="/login" className="link-button">Sign in</Link>
-          <Link to="/register" className="landing-cta-small">Get started</Link>
-        </div>
-      </header>
+      <PublicHeader />
 
       <section className="landing-hero">
         <h1>Deposit, earn daily rewards, and grow with referrals</h1>
@@ -101,9 +97,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="landing-footer">
-        <p>© {new Date().getFullYear()} Rewards. All amounts and rates are configurable and subject to change.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
