@@ -78,9 +78,9 @@
 
   /* --- Auth pages --- */
 
-  .auth-page { @apply min-h-screen flex items-center justify-center p-6; }
+  .auth-page { @apply min-h-screen flex items-center justify-center p-4 sm:p-6; }
   .auth-card {
-    @apply w-full max-w-[380px] bg-white border border-slate-200 rounded-3xl shadow-card-lg px-8 py-9 flex flex-col gap-4 relative;
+    @apply w-full max-w-[380px] bg-white border border-slate-200 rounded-3xl shadow-card-lg px-5 py-8 sm:px-8 sm:py-9 flex flex-col gap-4 relative;
   }
   .auth-card::before {
     content: '';
@@ -132,16 +132,20 @@
   .app-header {
     @apply bg-white/85 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10;
   }
-  .app-header-top { @apply flex items-center justify-between px-6 pt-4 pb-3; }
-  .app-nav { @apply flex items-center gap-1 flex-wrap px-[1.15rem] pb-3; }
+  .app-header-top { @apply flex items-center justify-between gap-2 px-6 pt-4 pb-3 max-[480px]:px-4; }
+  .app-nav {
+    @apply flex items-center gap-1 px-[1.15rem] pb-3 overflow-x-auto;
+    scrollbar-width: none;
+  }
+  .app-nav::-webkit-scrollbar { display: none; }
   .app-nav-link {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.82rem] font-semibold text-slate-500
-      hover:bg-slate-100 hover:text-slate-900;
+      whitespace-nowrap flex-shrink-0 hover:bg-slate-100 hover:text-slate-900;
   }
   .app-nav-link.active { @apply bg-brand-50 text-brand-700; }
 
   .app-title {
-    @apply font-extrabold text-[1.05rem] text-slate-900 inline-flex items-center gap-2 tracking-tight;
+    @apply font-extrabold text-[1.05rem] text-slate-900 inline-flex items-center gap-2 tracking-tight min-w-0 truncate;
   }
   .app-logo-mark {
     @apply inline-block flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-600/40;
@@ -149,8 +153,7 @@
   .app-logo-img {
     @apply inline-block flex-shrink-0 rounded-lg object-cover;
   }
-  .app-header-right { @apply flex items-center gap-4; }
-  .app-user-name { @apply text-sm font-semibold text-slate-700 hover:text-brand-600; }
+  .app-user-name { @apply text-sm font-semibold text-slate-700; }
   .app-main { @apply flex-1 w-full max-w-[680px] mx-auto px-5 pt-6 pb-12; }
 
   /* --- Balance / stats / quick actions --- */
@@ -245,9 +248,9 @@
   }
   .referral-code-label { @apply text-[0.76rem] opacity-80 font-semibold uppercase tracking-wide; }
   .referral-code { @apply text-[1.6rem] font-extrabold tracking-widest; }
-  .referral-link-row { @apply flex gap-2 mt-1; }
+  .referral-link-row { @apply flex gap-2 mt-1 min-w-0; }
   .referral-link-row input {
-    @apply flex-1 px-3 py-2.5 border border-white/25 rounded-lg text-white/90 bg-white/10 min-w-0 font-medium;
+    @apply flex-1 min-w-0 px-3 py-2.5 border border-white/25 rounded-lg text-white/90 bg-white/10 font-medium;
   }
   .referral-link-row button {
     @apply bg-white text-brand-700 border-0 rounded-lg px-4 font-bold whitespace-nowrap;
@@ -298,19 +301,19 @@
   /* --- Public landing page --- */
 
   .landing-page { @apply max-w-[1040px] mx-auto px-6 pb-12; }
-  .landing-header { @apply flex items-center justify-between py-5; }
-  .landing-header-actions { @apply flex items-center gap-5; }
+  .landing-header { @apply flex items-center justify-between gap-3 py-5; }
+  .landing-header-actions { @apply flex items-center gap-3 sm:gap-5 flex-shrink-0; }
   .landing-cta-small {
     @apply bg-gradient-to-br from-brand-600 to-brand-700 text-white font-bold text-sm px-4.5 py-2.5 rounded-full
       shadow-md shadow-brand-600/30;
   }
 
-  .landing-hero { @apply text-center py-12 pb-14 flex flex-col items-center gap-4.5; }
+  .landing-hero { @apply text-center py-10 sm:py-12 pb-14 flex flex-col items-center gap-4.5 px-2; }
   .landing-hero h1 {
-    @apply text-[2.4rem] leading-tight max-w-[720px] m-0 bg-clip-text text-transparent;
+    @apply text-[1.9rem] sm:text-[2.4rem] leading-tight max-w-[720px] m-0 bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, #0f172a 30%, #0d9488);
   }
-  .landing-hero > p { @apply max-w-[560px] text-slate-500 text-[1.02rem] leading-relaxed m-0; }
+  .landing-hero > p { @apply max-w-[560px] text-slate-500 text-[0.95rem] sm:text-[1.02rem] leading-relaxed m-0; }
   .landing-hero-actions { @apply flex gap-3.5 flex-wrap justify-center mt-2; }
   .landing-cta {
     @apply bg-gradient-to-br from-brand-600 to-brand-700 text-white font-bold px-6.5 py-3.5 rounded-lg

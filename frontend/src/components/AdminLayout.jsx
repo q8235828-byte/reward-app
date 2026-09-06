@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useBranding } from '../context/BrandingContext';
 import Logo from './Logo';
 import { api } from '../services/api';
-import { formatCurrency } from '../utils/format';
+import { formatCurrency, getInitials } from '../utils/format';
 import {
   HomeIcon, UsersIcon, DepositIcon, WithdrawIcon, PlansIcon,
   ReferralIcon, GiftIcon, TransactionsIcon, SettingsIcon, AuditIcon, LogoutIcon,
@@ -23,11 +23,6 @@ const NAV_ITEMS = [
   { to: '/admin/settings', label: 'Settings', icon: SettingsIcon },
   { to: '/admin/audit-logs', label: 'Audit Logs', icon: AuditIcon },
 ];
-
-function getInitials(name) {
-  if (!name) return '?';
-  return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
-}
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
