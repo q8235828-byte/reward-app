@@ -8,7 +8,7 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
     "test": "node --test test/",
-    "postinstall": "npm install --prefix frontend && npm run build --prefix frontend"
+    "postinstall": "npm install --prefix frontend --include=dev && npm run build --prefix frontend"
   },
   "engines": {
     "node": ">=18.0.0"
