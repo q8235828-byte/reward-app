@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import PasswordInput from '../components/PasswordInput';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -16,7 +19,8 @@ export default function LoginPage() {
     setError('');
     setSubmitting(true);
     try {
-      await login(form.email, form.password);
+      const user = await login(form.email, form.password);
+      showToast(`Welcome back, ${user.fullName.split(' ')[0]}!`, 'success');
       navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -36,8 +40,9 @@ export default function LoginPage() {
         </label>
         <label>
           Password
-          <input type="password" name="password" value={form.password} onChange={handleChange} required />
+          <PasswordInput name="password" value={form.password} onChange={handleChange} required autoComplete="current-password" />
         </label>
+        <p className="auth-forgot"><Link to="/forgot-password">Forgot password?</Link></p>
         <button type="submit" disabled={submitting}>{submitting ? 'Signing in…' : 'Sign in'}</button>
         <p className="auth-switch">No account? <Link to="/register">Register</Link></p>
       </form>

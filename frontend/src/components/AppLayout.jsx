@@ -37,7 +37,7 @@ export default function AppLayout() {
                 Admin panel
               </Link>
             )}
-            <span className="app-user-name">{user?.fullName}</span>
+            <Link to="/profile" className="app-user-name">{user?.fullName}</Link>
             <button type="button" className="link-button" onClick={handleLogout}>
               <LogoutIcon size={15} />
               Log out

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import PasswordInput from '../components/PasswordInput';
 
 export default function RegisterPage() {
   const { register, login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
@@ -25,6 +28,7 @@ export default function RegisterPage() {
     try {
       await register(form);
       await login(form.email, form.password);
+      showToast('Account created - welcome!', 'success');
       navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -52,7 +56,7 @@ export default function RegisterPage() {
         </label>
         <label>
           Password
-          <input type="password" name="password" value={form.password} onChange={handleChange} required minLength={8} />
+          <PasswordInput name="password" value={form.password} onChange={handleChange} required minLength={8} autoComplete="new-password" />
         </label>
         <label>
           Referral code (optional)
