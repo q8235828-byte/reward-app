@@ -264,7 +264,9 @@ CREATE TABLE IF NOT EXISTS reward_ledger (
 CREATE TABLE IF NOT EXISTS app_settings (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   setting_key VARCHAR(100) NOT NULL,
-  setting_value VARCHAR(255) NOT NULL,
+  -- MEDIUMTEXT (not VARCHAR(255)) because logo_url can hold a base64 data
+  -- URI of an uploaded image, not just short config strings.
+  setting_value MEDIUMTEXT NOT NULL,
   description VARCHAR(255) DEFAULT NULL,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),

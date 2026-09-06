@@ -143,11 +143,11 @@
   .app-title {
     @apply font-extrabold text-[1.05rem] text-slate-900 inline-flex items-center gap-2 tracking-tight;
   }
-  .app-title::before {
-    content: '';
-    @apply w-6.5 h-6.5 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-600/40;
-    width: 26px;
-    height: 26px;
+  .app-logo-mark {
+    @apply inline-block flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-600/40;
+  }
+  .app-logo-img {
+    @apply inline-block flex-shrink-0 rounded-lg object-cover;
   }
   .app-header-right { @apply flex items-center gap-4; }
   .app-user-name { @apply text-sm font-semibold text-slate-700 hover:text-brand-600; }

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
+import Logo from './Logo';
 import { api } from '../services/api';
 import { formatCurrency } from '../utils/format';
 import {
@@ -29,6 +31,7 @@ function getInitials(name) {
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { siteName } = useBranding();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -65,7 +68,7 @@ export default function AdminLayout() {
   return (
     <div className="admin-shell">
       <header className="admin-topbar">
-        <Link to="/admin" className="app-title">Admin</Link>
+        <Link to="/admin" className="app-title"><Logo />{siteName} Admin</Link>
 
         <div className="admin-topbar-right">
           {stats && (

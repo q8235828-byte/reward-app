@@ -12,12 +12,16 @@ async function getPublicSettings(req, res, next) {
       withdrawalMinAccountAgeDays,
       currency,
       referralThreshold,
+      siteName,
+      logoUrl,
     ] = await Promise.all([
       settingsService.getNumber('minimum_withdrawal', 500),
       settingsService.getNumber('maximum_withdrawal', 25000),
       settingsService.getNumber('withdrawal_min_account_age_days', 14),
       settingsService.getRaw('currency', 'PKR'),
       settingsService.getNumber('referral_threshold', 5),
+      settingsService.getRaw('site_name', 'Rewards'),
+      settingsService.getRaw('logo_url', ''),
     ]);
 
     res.status(200).json({
@@ -29,6 +33,8 @@ async function getPublicSettings(req, res, next) {
           withdrawalMinAccountAgeDays,
           currency,
           referralThreshold,
+          siteName: siteName || 'Rewards',
+          logoUrl: logoUrl || '',
         },
       },
     });

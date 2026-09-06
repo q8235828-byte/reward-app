@@ -1,4 +1,5 @@
 const settingsService = require('../services/settings.service');
+const mailService = require('../services/mail.service');
 
 async function listSettings(req, res, next) {
   try {
@@ -20,4 +21,13 @@ async function updateSettings(req, res, next) {
   }
 }
 
-module.exports = { listSettings, updateSettings };
+async function sendTestEmail(req, res, next) {
+  try {
+    await mailService.sendTestEmail(req.user.email);
+    res.status(200).json({ success: true, message: `Test email sent to ${req.user.email}.` });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { listSettings, updateSettings, sendTestEmail };

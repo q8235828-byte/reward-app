@@ -84,9 +84,19 @@ const ALLOWED_SETTING_KEYS = [
   'bonus_commission_rate',
   'bonus_reward_multiplier',
   'currency',
+  'site_name',
+  'logo_url',
+  'smtp_host',
+  'smtp_port',
+  'smtp_secure',
+  'smtp_user',
+  'smtp_password',
+  'mail_from',
 ];
 
-const updateSettingsSchema = z.record(z.string())
+// logo_url can be a base64 data URI (an uploaded image) - cap it well
+// above a typical small logo's encoded size, everything else stays short.
+const updateSettingsSchema = z.record(z.string().max(2_000_000))
   .refine((obj) => Object.keys(obj).length > 0, { message: 'Provide at least one setting to update.' })
   .refine(
     (obj) => Object.keys(obj).every((key) => ALLOWED_SETTING_KEYS.includes(key)),

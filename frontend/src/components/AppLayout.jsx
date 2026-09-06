@@ -1,5 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
+import Logo from './Logo';
 import {
   ShieldIcon, LogoutIcon, HomeIcon, DepositIcon, WithdrawIcon,
   PlansIcon, ReferralIcon, TransactionsIcon,
@@ -18,6 +20,7 @@ const NAV_ITEMS = [
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
+  const { siteName } = useBranding();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -29,7 +32,7 @@ export default function AppLayout() {
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header-top">
-          <Link to="/" className="app-title">Rewards</Link>
+          <Link to="/" className="app-title"><Logo />{siteName}</Link>
           <div className="app-header-right">
             {user && ADMIN_ROLES.includes(user.role) && (
               <Link to="/admin" className="link-button">

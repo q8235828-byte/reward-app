@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
+import { useBranding } from '../context/BrandingContext';
 
 export default function Footer() {
+  const { siteName } = useBranding();
   return (
     <footer className="site-footer">
       <div className="site-footer-columns">
         <div className="site-footer-column">
-          <span className="app-title">Rewards</span>
+          <span className="app-title"><Logo />{siteName}</span>
           <p>A deposit, daily-reward, and referral platform.</p>
         </div>
         <div className="site-footer-column">
@@ -27,7 +30,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="site-footer-bottom">
-        <span>© {new Date().getFullYear()} Rewards. All amounts and rates are configurable and are not a guaranteed return.</span>
+        <span>© {new Date().getFullYear()} {siteName}. All amounts and rates are configurable and are not a guaranteed return.</span>
       </div>
     </footer>
   );

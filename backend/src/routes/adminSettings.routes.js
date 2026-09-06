@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.get('/', controller.listSettings);
 router.patch('/', validate(updateSettingsSchema), controller.updateSettings);
+router.post('/test-email', controller.sendTestEmail);
 
 module.exports = router;

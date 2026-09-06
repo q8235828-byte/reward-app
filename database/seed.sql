@@ -28,7 +28,15 @@ INSERT INTO app_settings (setting_key, setting_value, description) VALUES
 ('bonus_enabled',                   'false', 'Whether the 5+ referral bonus tier is active.'),
 ('bonus_commission_rate',           '0.00',  'Extra referral commission percentage once the threshold is met.'),
 ('bonus_reward_multiplier',         '1.00',  'Multiplier applied to rewards once the threshold is met.'),
-('currency',                        'PKR',   'Application currency code.');
+('currency',                        'PKR',   'Application currency code.'),
+('site_name',                       'Rewards', 'Application name shown in the header, browser tab, and emails.'),
+('logo_url',                        '',      'Uploaded application logo (data URI). Leave blank to use the default generated mark.'),
+('smtp_host',                       '',      'SMTP server host. Leave blank to use the SMTP_HOST environment variable.'),
+('smtp_port',                       '',      'SMTP server port. Leave blank to use the SMTP_PORT environment variable.'),
+('smtp_secure',                     '',      'true/false - use TLS (typically true for port 465). Leave blank to use the SMTP_SECURE environment variable.'),
+('smtp_user',                       '',      'SMTP username. Leave blank to use the SMTP_USER environment variable.'),
+('smtp_password',                   '',      'SMTP password. Leave blank to use the SMTP_PASSWORD environment variable.'),
+('mail_from',                       '',      'From address for outgoing email. Leave blank to use the MAIL_FROM environment variable.');
 
 -- ---------------------------------------------------------------------
 -- Initial admin account (OPTIONAL - development only)

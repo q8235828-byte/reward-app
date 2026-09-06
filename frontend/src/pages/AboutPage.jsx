@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import PublicPageLayout from '../components/PublicPageLayout';
+import { useBranding } from '../context/BrandingContext';
 
 export default function AboutPage() {
+  const { siteName } = useBranding();
   return (
     <PublicPageLayout>
-      <h1>About Rewards</h1>
+      <h1>About {siteName}</h1>
       <p className="info-lede">
-        Rewards is a deposit, daily-reward, and referral platform. Users choose a plan, deposit
+        {siteName} is a deposit, daily-reward, and referral platform. Users choose a plan, deposit
         through JazzCash or Easypaisa, and earn rewards on their deposit according to that plan's
         rate and schedule. A referral program lets members earn a commission when people they
         invite make an approved deposit.

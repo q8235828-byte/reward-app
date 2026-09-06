@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { BrandingProvider } from './context/BrandingContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AppLayout from './components/AppLayout';
@@ -37,6 +38,7 @@ import AdminAuditLogsPage from './pages/admin/AdminAuditLogsPage';
 export default function App() {
   return (
     <ToastProvider>
+    <BrandingProvider>
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -81,6 +83,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
+    </BrandingProvider>
     </ToastProvider>
   );
 }

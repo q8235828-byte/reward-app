@@ -33,8 +33,10 @@ app.use(helmet());
 // pinned to APP_URL rather than left permissive.
 app.use(cors({ origin: env.appUrl, credentials: true }));
 
-app.use(express.json({ limit: '100kb' }));
-app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+// 2mb (not the default 100kb) because the admin settings PATCH can carry a
+// base64-encoded logo upload in one of its fields (see logo_url setting).
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
 
 app.use('/api/health', healthRoutes);
