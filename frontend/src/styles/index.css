@@ -8,13 +8,12 @@
   }
 
   html,
-  body,
   #root {
     @apply h-full;
   }
 
   body {
-    @apply m-0 bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply m-0 min-h-full bg-slate-50 text-slate-900 font-sans antialiased bg-no-repeat;
     background-image:
       radial-gradient(1100px 520px at 12% -8%, rgb(13 148 136 / 0.08), transparent 60%),
       radial-gradient(900px 480px at 100% 0%, rgb(13 148 136 / 0.05), transparent 55%);
