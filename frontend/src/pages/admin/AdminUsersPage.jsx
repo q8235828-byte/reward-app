@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
       <h1>Users</h1>
       <form className="filter-form" onSubmit={handleSearchSubmit}>
         <input
-          placeholder="Search name, email, phone, referral code"
+          placeholder="Search name, phone, referral code"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
@@ -53,13 +53,12 @@ export default function AdminUsersPage() {
         <div className="admin-table-wrapper">
           <table className="admin-table">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Joined</th><th /></tr>
+              <tr><th>Name</th><th>Phone</th><th>Status</th><th>Joined</th><th /></tr>
             </thead>
             <tbody>
               {items.map((u) => (
                 <tr key={u.id}>
                   <td>{u.fullName}</td>
-                  <td>{u.email}</td>
                   <td>{u.phone}</td>
                   <td><span className={`status-badge status-${u.status.toLowerCase()}`}>{u.status}</span></td>
                   <td>{formatDate(u.createdAt)}</td>

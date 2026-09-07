@@ -68,7 +68,7 @@ export default function AdminDepositsPage() {
             <tbody>
               {items.map((d) => (
                 <tr key={d.id}>
-                  <td>{d.userFullName}<br /><span className="muted">{d.userEmail}</span></td>
+                  <td>{d.userFullName}<br /><span className="muted">{d.userPhone}</span></td>
                   <td>{formatCurrency(d.amount)}</td>
                   <td>{d.paymentMethod}</td>
                   <td>{d.transactionReference || '—'}</td>

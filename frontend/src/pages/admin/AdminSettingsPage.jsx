@@ -26,6 +26,7 @@ export default function AdminSettingsPage() {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [logoError, setLogoError] = useState('');
+  const [testEmailTo, setTestEmailTo] = useState('');
   const [testEmailStatus, setTestEmailStatus] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
   const fileInputRef = useRef(null);
@@ -89,7 +90,7 @@ export default function AdminSettingsPage() {
     setTestEmailStatus('');
     setSendingTest(true);
     try {
-      const res = await api.post('/admin/settings/test-email');
+      const res = await api.post('/admin/settings/test-email', { to: testEmailTo });
       setTestEmailStatus(res.message || 'Test email sent.');
     } catch (err) {
       setTestEmailStatus(err.message);
@@ -209,8 +210,15 @@ export default function AdminSettingsPage() {
             display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap',
           }}
           >
-            <button type="button" className="link-button" onClick={handleTestEmail} disabled={sendingTest}>
-              {sendingTest ? 'Sending…' : 'Send test email to myself'}
+            <input
+              type="email"
+              value={testEmailTo}
+              onChange={(e) => setTestEmailTo(e.target.value)}
+              placeholder="you@example.com"
+              style={{ maxWidth: 240 }}
+            />
+            <button type="button" className="link-button" onClick={handleTestEmail} disabled={sendingTest || !testEmailTo}>
+              {sendingTest ? 'Sending…' : 'Send test email'}
             </button>
             {testEmailStatus && <span className="setting-description">{testEmailStatus}</span>}
           </div>

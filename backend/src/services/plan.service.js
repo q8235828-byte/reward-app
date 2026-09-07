@@ -24,11 +24,13 @@ function validateDepositAmount(plan, amount) {
   const min = toDecimal(plan.min_amount);
   const max = toDecimal(plan.max_amount);
   if (value.lt(min) || value.gt(max)) {
-    throw new AppError(
-      400,
-      `Amount must be between ${min.toFixed(2)} and ${max.toFixed(2)} for this plan.`,
-      'AMOUNT_OUT_OF_RANGE',
-    );
+    // Fixed-amount plans (min_amount === max_amount, the norm for this app
+    // - see PlansPage) get a plainer "must be exactly X" message instead of
+    // a redundant "between X and X".
+    const message = min.equals(max)
+      ? `Amount must be exactly ${min.toFixed(2)} for this plan.`
+      : `Amount must be between ${min.toFixed(2)} and ${max.toFixed(2)} for this plan.`;
+    throw new AppError(400, message, 'AMOUNT_OUT_OF_RANGE');
   }
 }
 
@@ -42,7 +44,7 @@ async function listAllPlans() {
 }
 
 async function createPlan({
-  name, minAmount, maxAmount, rewardRate, rewardFrequency, description, status, adminId, ipAddress,
+  name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays, description, status, adminId, ipAddress,
 }) {
   if (toDecimal(minAmount).gt(maxAmount)) {
     throw new AppError(400, 'minAmount must not be greater than maxAmount.', 'INVALID_AMOUNT_RANGE');
@@ -53,7 +55,7 @@ async function createPlan({
     await connection.beginTransaction();
 
     const planId = await planRepository.create(connection, {
-      name, minAmount, maxAmount, rewardRate, rewardFrequency, description, status,
+      name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays, description, status,
     });
 
     await auditLogService.log(connection, {
@@ -63,7 +65,7 @@ async function createPlan({
       targetId: planId,
       previousValue: null,
       newValue: {
-        name, minAmount, maxAmount, rewardRate, rewardFrequency, status,
+        name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays, status,
       },
       ipAddress,
     });
@@ -96,6 +98,7 @@ async function updatePlan({
       maxAmount: updates.maxAmount ?? plan.max_amount,
       rewardRate: updates.rewardRate ?? plan.reward_rate,
       rewardFrequency: updates.rewardFrequency ?? plan.reward_frequency,
+      durationDays: updates.durationDays !== undefined ? updates.durationDays : plan.duration_days,
       description: updates.description ?? plan.description,
       status: updates.status ?? plan.status,
     };
@@ -117,6 +120,7 @@ async function updatePlan({
         maxAmount: plan.max_amount,
         rewardRate: plan.reward_rate,
         rewardFrequency: plan.reward_frequency,
+        durationDays: plan.duration_days,
         status: plan.status,
       },
       newValue: merged,

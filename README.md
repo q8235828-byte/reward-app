@@ -19,8 +19,8 @@ Implemented so far:
 - MySQL connection pool (`mysql2`) configured entirely from environment variables
 - Full database schema (`database/schema.sql`) and seed data (`database/seed.sql`)
 - Centralized error handling (JSON error format, no stack traces)
-- Registration, login, logout, password change, and password reset (email link via SMTP, or
-  logged to the console if SMTP isn't configured yet)
+- Registration, login (both phone-based, no email), logout, password change, and password reset
+  (link sent via SMS, or logged to the console if no SMS gateway is configured yet)
 - Passwords hashed with bcryptjs (pure JS - no native build step needed on Hostinger)
 - Stateless JWT sessions in an httpOnly cookie; logout/password change/reset immediately
   invalidate any previously issued tokens via a `token_version` check
@@ -40,12 +40,12 @@ Implemented so far:
 ### Auth endpoints
 
 ```
-POST /api/auth/register              { fullName, email, phone, password, referralCode? }
-POST /api/auth/login                 { email, password }
+POST /api/auth/register              { fullName, phone, password, referralCode? }
+POST /api/auth/login                 { phone, password }
 POST /api/auth/logout                (requires session cookie)
 GET  /api/auth/me                    (requires session cookie)
 POST /api/auth/password/change       { currentPassword, newPassword } (requires session cookie)
-POST /api/auth/password/reset/request { email }
+POST /api/auth/password/reset/request { phone }
 POST /api/auth/password/reset/confirm { token, newPassword }
 ```
 
@@ -464,7 +464,7 @@ frontend/
   dist/                  # `npm run build` output (gitignored) - served by Express in production
 database/
   schema.sql              # full table definitions
-  seed.sql                # 5 plans + default app settings
+  seed.sql                # 12 fixed-amount plans + default app settings
 docs/
   HOSTINGER-SETUP.md      # deploying the Node.js app + frontend build on Hostinger
   DATABASE-SETUP.md       # creating the MySQL database on Hostinger

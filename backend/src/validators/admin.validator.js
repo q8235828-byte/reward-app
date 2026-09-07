@@ -54,6 +54,7 @@ const createPlanSchema = z.object({
   maxAmount: z.coerce.number().positive(),
   rewardRate: z.coerce.number().min(0).max(100),
   rewardFrequency: z.enum(PLAN_FREQUENCIES).optional().default('DAILY'),
+  durationDays: z.coerce.number().int().positive().optional(),
   description: z.string().trim().max(1000).optional(),
   status: z.enum(PLAN_STATUSES).optional().default('ACTIVE'),
 }).refine((data) => data.minAmount <= data.maxAmount, {
@@ -67,6 +68,7 @@ const updatePlanSchema = z.object({
   maxAmount: z.coerce.number().positive().optional(),
   rewardRate: z.coerce.number().min(0).max(100).optional(),
   rewardFrequency: z.enum(PLAN_FREQUENCIES).optional(),
+  durationDays: z.coerce.number().int().positive().optional(),
   description: z.string().trim().max(1000).optional(),
   status: z.enum(PLAN_STATUSES).optional(),
 });
@@ -102,6 +104,10 @@ const updateSettingsSchema = z.record(z.string().max(2_000_000))
     (obj) => Object.keys(obj).every((key) => ALLOWED_SETTING_KEYS.includes(key)),
     { message: `Unknown setting key. Allowed keys: ${ALLOWED_SETTING_KEYS.join(', ')}` },
   );
+
+const sendTestEmailSchema = z.object({
+  to: z.string().trim().email('Enter a valid email address.'),
+});
 
 // --- Referrals / rewards / transactions (global admin views) ---
 
@@ -146,6 +152,7 @@ module.exports = {
   createPlanSchema,
   updatePlanSchema,
   updateSettingsSchema,
+  sendTestEmailSchema,
   ALLOWED_SETTING_KEYS,
   listAllReferralsQuerySchema,
   listAllRewardsQuerySchema,

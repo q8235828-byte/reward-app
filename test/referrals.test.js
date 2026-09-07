@@ -20,30 +20,33 @@ beforeEach(async () => {
 });
 after(async () => { await closeDb(); });
 
-async function getStarterPlanId() {
-  const [rows] = await pool.query("SELECT id FROM plans WHERE name = 'Starter' LIMIT 1");
-  if (!rows[0]) throw new Error('Starter plan not found - did you import database/seed.sql into the test database?');
-  return rows[0].id;
+async function getFirstPlan() {
+  const [rows] = await pool.query("SELECT * FROM plans WHERE name = 'Plan.1' LIMIT 1");
+  if (!rows[0]) throw new Error('Plan.1 not found - did you import database/seed.sql into the test database?');
+  return rows[0];
 }
 
-async function depositAndApprove(admin, client, planId, amount = 1000) {
-  const created = await client.post('/api/deposits').send({ planId, amount, paymentMethod: 'JAZZCASH' });
+// Plans are fixed-amount (min_amount === max_amount) - `amount` defaults
+// to the plan's own fixed amount rather than an arbitrary figure.
+async function depositAndApprove(admin, client, plan) {
+  const amount = Number(plan.min_amount);
+  const created = await client.post('/api/deposits').send({ planId: plan.id, amount, paymentMethod: 'JAZZCASH' });
   const depositId = created.body.data.deposit.id;
   const approved = await admin.post(`/api/admin/deposits/${depositId}/approve`).send({});
   assert.equal(approved.status, 200, `test setup deposit approval failed: ${JSON.stringify(approved.body)}`);
-  return approved.body.data.deposit;
+  return { deposit: approved.body.data.deposit, amount };
 }
 
 test('an approved deposit from a referred user pays the referrer a commission and qualifies the referral', async () => {
   const referrer = await createAuthenticatedClient(app);
   const referred = await createAuthenticatedClient(app, { referralCode: referrer.referralCode });
   const admin = await createAdminClient(app, pool);
-  const planId = await getStarterPlanId();
+  const plan = await getFirstPlan();
 
-  await depositAndApprove(admin, referred, planId, 1000);
+  const { amount } = await depositAndApprove(admin, referred, plan);
 
   const [settings] = await pool.query("SELECT setting_value FROM app_settings WHERE setting_key = 'referral_commission_rate'");
-  const expectedCommission = (1000 * Number(settings[0].setting_value)) / 100;
+  const expectedCommission = (amount * Number(settings[0].setting_value)) / 100;
 
   const referrerWallet = await walletService.getWalletByUserId(referrer.userId);
   assert.equal(Number(referrerWallet.referralBalance), expectedCommission);
@@ -56,9 +59,9 @@ test('CRITICAL: retrying deposit approval never generates a duplicate commission
   const referrer = await createAuthenticatedClient(app);
   const referred = await createAuthenticatedClient(app, { referralCode: referrer.referralCode });
   const admin = await createAdminClient(app, pool);
-  const planId = await getStarterPlanId();
+  const plan = await getFirstPlan();
 
-  const deposit = await depositAndApprove(admin, referred, planId, 1000);
+  const { deposit, amount } = await depositAndApprove(admin, referred, plan);
 
   // Simulate a retried approval directly at the service layer (the HTTP
   // route already no-ops on a repeat call - see deposits.test.js - this
@@ -74,14 +77,14 @@ test('CRITICAL: retrying deposit approval never generates a duplicate commission
 
   const referrerWallet = await walletService.getWalletByUserId(referrer.userId);
   const [settings] = await pool.query("SELECT setting_value FROM app_settings WHERE setting_key = 'referral_commission_rate'");
-  const expectedCommission = (1000 * Number(settings[0].setting_value)) / 100;
+  const expectedCommission = (amount * Number(settings[0].setting_value)) / 100;
   assert.equal(Number(referrerWallet.referralBalance), expectedCommission, 'commission must not be doubled');
 });
 
 test('5+ qualifying referrals unlock the bonus commission rate for the next commission', async () => {
   const referrer = await createAuthenticatedClient(app);
   const admin = await createAdminClient(app, pool);
-  const planId = await getStarterPlanId();
+  const plan = await getFirstPlan();
 
   await pool.query("UPDATE app_settings SET setting_value = 'true' WHERE setting_key = 'bonus_enabled'");
   await pool.query("UPDATE app_settings SET setting_value = '5' WHERE setting_key = 'bonus_commission_rate'");
@@ -90,7 +93,7 @@ test('5+ qualifying referrals unlock the bonus commission rate for the next comm
     // eslint-disable-next-line no-await-in-loop
     const referred = await createAuthenticatedClient(app, { referralCode: referrer.referralCode });
     // eslint-disable-next-line no-await-in-loop
-    await depositAndApprove(admin, referred, planId, 1000);
+    await depositAndApprove(admin, referred, plan);
   }
 
   const stats = await referralService.getReferralStats(referrer.userId);
@@ -99,12 +102,12 @@ test('5+ qualifying referrals unlock the bonus commission rate for the next comm
 
   const sixthReferred = await createAuthenticatedClient(app, { referralCode: referrer.referralCode });
   const walletBefore = await walletService.getWalletByUserId(referrer.userId);
-  await depositAndApprove(admin, sixthReferred, planId, 1000);
+  const { amount } = await depositAndApprove(admin, sixthReferred, plan);
   const walletAfter = await walletService.getWalletByUserId(referrer.userId);
 
   const [baseRateRows] = await pool.query("SELECT setting_value FROM app_settings WHERE setting_key = 'referral_commission_rate'");
   const boostedRate = Number(baseRateRows[0].setting_value) + 5;
-  const expectedSixthCommission = (1000 * boostedRate) / 100;
+  const expectedSixthCommission = (amount * boostedRate) / 100;
   const actualDelta = Number(walletAfter.referralBalance) - Number(walletBefore.referralBalance);
   assert.equal(actualDelta, expectedSixthCommission, "the 6th referrer's commission should include the bonus rate");
 });

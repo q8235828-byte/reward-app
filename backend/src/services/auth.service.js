@@ -9,7 +9,7 @@ const { signToken } = require('../utils/jwt');
 const { generateReferralCode } = require('../utils/referralCode');
 const { normalizePhone } = require('../utils/phone');
 const AppError = require('../utils/AppError');
-const mailService = require('./mail.service');
+const smsService = require('./sms.service');
 const logger = require('../utils/logger');
 const env = require('../config/env');
 
@@ -32,19 +32,14 @@ async function generateUniqueReferralCode() {
 }
 
 async function register({
-  fullName, email, phone, password, referralCode,
+  fullName, phone, password, referralCode,
 }) {
-  const normalizedEmail = email.trim().toLowerCase();
   const normalizedPhone = normalizePhone(phone);
   if (!normalizedPhone) {
     throw new AppError(400, 'Enter a valid Pakistani mobile number.', 'INVALID_PHONE');
   }
 
-  const [existingEmail, existingPhone] = await Promise.all([
-    userRepository.findByEmail(pool, normalizedEmail),
-    userRepository.findByPhone(pool, normalizedPhone),
-  ]);
-  if (existingEmail) throw new AppError(409, 'Email is already registered.', 'EMAIL_TAKEN');
+  const existingPhone = await userRepository.findByPhone(pool, normalizedPhone);
   if (existingPhone) throw new AppError(409, 'Phone number is already registered.', 'PHONE_TAKEN');
 
   let referredBy = null;
@@ -65,7 +60,6 @@ async function register({
 
     const userId = await userRepository.createUser(connection, {
       fullName: fullName.trim(),
-      email: normalizedEmail,
       phone: normalizedPhone,
       passwordHash,
       referralCode: newReferralCode,
@@ -90,7 +84,7 @@ async function register({
   } catch (error) {
     await connection.rollback();
     if (error.code === 'ER_DUP_ENTRY') {
-      throw new AppError(409, 'Email, phone, or referral code is already in use.', 'DUPLICATE_ENTRY');
+      throw new AppError(409, 'Phone number or referral code is already in use.', 'DUPLICATE_ENTRY');
     }
     throw error;
   } finally {
@@ -98,22 +92,26 @@ async function register({
   }
 }
 
-async function login({ email, password }) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = await userRepository.findByEmail(pool, normalizedEmail);
+async function login({ phone, password }) {
+  const normalizedPhone = normalizePhone(phone);
+  if (!normalizedPhone) {
+    throw new AppError(400, 'Enter a valid Pakistani mobile number.', 'INVALID_PHONE');
+  }
+
+  const user = await userRepository.findByPhone(pool, normalizedPhone);
   if (!user) {
-    logger.warn('AUTH_LOGIN_FAILED', { email: normalizedEmail, reason: 'NO_SUCH_USER' });
-    throw new AppError(401, 'Invalid email or password.', 'INVALID_CREDENTIALS');
+    logger.warn('AUTH_LOGIN_FAILED', { phone: normalizedPhone, reason: 'NO_SUCH_USER' });
+    throw new AppError(401, 'Invalid phone number or password.', 'INVALID_CREDENTIALS');
   }
 
   const passwordMatches = await comparePassword(password, user.password_hash);
   if (!passwordMatches) {
-    logger.warn('AUTH_LOGIN_FAILED', { email: normalizedEmail, reason: 'BAD_PASSWORD' });
-    throw new AppError(401, 'Invalid email or password.', 'INVALID_CREDENTIALS');
+    logger.warn('AUTH_LOGIN_FAILED', { phone: normalizedPhone, reason: 'BAD_PASSWORD' });
+    throw new AppError(401, 'Invalid phone number or password.', 'INVALID_CREDENTIALS');
   }
 
   if (user.status !== 'ACTIVE') {
-    logger.warn('AUTH_LOGIN_FAILED', { email: normalizedEmail, reason: `ACCOUNT_${user.status}` });
+    logger.warn('AUTH_LOGIN_FAILED', { phone: normalizedPhone, reason: `ACCOUNT_${user.status}` });
     throw new AppError(403, STATUS_MESSAGES[user.status] || 'Account is not active.', 'ACCOUNT_NOT_ACTIVE');
   }
 
@@ -139,10 +137,12 @@ async function changePassword({ userId, currentPassword, newPassword }) {
   await userRepository.incrementTokenVersion(pool, userId);
 }
 
-async function requestPasswordReset({ email }) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = await userRepository.findByEmail(pool, normalizedEmail);
-  if (!user) return; // do not reveal whether the email is registered
+async function requestPasswordReset({ phone }) {
+  const normalizedPhone = normalizePhone(phone);
+  if (!normalizedPhone) return; // do not reveal whether the phone number is registered
+
+  const user = await userRepository.findByPhone(pool, normalizedPhone);
+  if (!user) return; // do not reveal whether the phone number is registered
 
   await passwordResetTokenRepository.deleteAllForUser(pool, user.id);
 
@@ -153,7 +153,11 @@ async function requestPasswordReset({ email }) {
   await passwordResetTokenRepository.create(pool, { userId: user.id, tokenHash, expiresAt });
 
   const resetUrl = `${env.appUrl}/reset-password?token=${rawToken}`;
-  await mailService.sendPasswordResetEmail(user.email, resetUrl);
+  const message = `Reset your password (valid for ${env.auth.resetTokenExpiryMinutes} minutes): ${resetUrl}`;
+  const result = await smsService.sendSms(user.phone, message);
+  if (!result.sent) {
+    logger.warn('PASSWORD_RESET_SMS_NOT_DELIVERED', { userId: user.id, reason: result.reason });
+  }
 }
 
 async function confirmPasswordReset({ token, newPassword }) {

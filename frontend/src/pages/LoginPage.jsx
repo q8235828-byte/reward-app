@@ -8,7 +8,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ phone: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,7 +19,7 @@ export default function LoginPage() {
     setError('');
     setSubmitting(true);
     try {
-      const user = await login(form.email, form.password);
+      const user = await login(form.phone, form.password);
       showToast(`Welcome back, ${user.fullName.split(' ')[0]}!`, 'success');
       navigate('/', { replace: true });
     } catch (err) {
@@ -35,8 +35,8 @@ export default function LoginPage() {
         <h1>Welcome back</h1>
         {error && <p className="form-error">{error}</p>}
         <label>
-          Email
-          <input type="email" name="email" value={form.email} onChange={handleChange} required autoFocus />
+          Mobile number
+          <input name="phone" value={form.phone} onChange={handleChange} required autoFocus placeholder="03XXXXXXXXX" />
         </label>
         <label>
           Password

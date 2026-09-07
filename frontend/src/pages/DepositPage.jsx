@@ -39,6 +39,16 @@ export default function DepositPage() {
     () => plans.find((p) => String(p.id) === String(form.planId)),
     [plans, form.planId],
   );
+  const isFixedAmount = Boolean(selectedPlan) && Number(selectedPlan.minAmount) === Number(selectedPlan.maxAmount);
+
+  // Fixed-amount plans (the norm here - see PlansPage) don't need the user
+  // to type an amount at all; keep form.amount in sync with the plan so
+  // the existing submit/validation code below doesn't need to change.
+  useEffect(() => {
+    if (isFixedAmount) {
+      setForm((f) => ({ ...f, amount: selectedPlan.minAmount }));
+    }
+  }, [isFixedAmount, selectedPlan]);
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -96,7 +106,9 @@ export default function DepositPage() {
                   <option value="" disabled>Select a plan</option>
                   {plans.map((plan) => (
                     <option key={plan.id} value={plan.id}>
-                      {plan.name} ({formatCurrency(plan.minAmount)} - {formatCurrency(plan.maxAmount)})
+                      {plan.name} ({Number(plan.minAmount) === Number(plan.maxAmount)
+                        ? formatCurrency(plan.minAmount)
+                        : `${formatCurrency(plan.minAmount)} - ${formatCurrency(plan.maxAmount)}`})
                     </option>
                   ))}
                 </select>
@@ -109,15 +121,19 @@ export default function DepositPage() {
               )}
               <label>
                 Amount
-                <input
-                  type="number"
-                  name="amount"
-                  min={selectedPlan?.minAmount || 0}
-                  max={selectedPlan?.maxAmount || undefined}
-                  value={form.amount}
-                  onChange={handleChange}
-                  required
-                />
+                {isFixedAmount ? (
+                  <input type="text" value={formatCurrency(selectedPlan.minAmount)} readOnly disabled />
+                ) : (
+                  <input
+                    type="number"
+                    name="amount"
+                    min={selectedPlan?.minAmount || 0}
+                    max={selectedPlan?.maxAmount || undefined}
+                    value={form.amount}
+                    onChange={handleChange}
+                    required
+                  />
+                )}
               </label>
               <label>
                 Payment method

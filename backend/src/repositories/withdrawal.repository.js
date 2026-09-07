@@ -85,7 +85,7 @@ async function listAll(conn, { status, page, pageSize }) {
   const { where, params } = buildAdminFilterClause({ status });
   const offset = (page - 1) * pageSize;
   const [rows] = await conn.query(
-    `SELECT w.*, u.full_name AS user_full_name, u.email AS user_email
+    `SELECT w.*, u.full_name AS user_full_name, u.phone AS user_phone
      FROM withdrawals w
      JOIN users u ON u.id = w.user_id
      ${where}
@@ -108,7 +108,7 @@ function sanitizeWithdrawal(row) {
     id: row.id,
     userId: row.user_id,
     userFullName: row.user_full_name,
-    userEmail: row.user_email,
+    userPhone: row.user_phone,
     amount: row.amount,
     paymentMethod: row.payment_method,
     accountName: row.account_name,

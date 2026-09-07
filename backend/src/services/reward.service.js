@@ -21,11 +21,10 @@ function daysSince(startedAt, referenceDate) {
 
 // WEEKLY/MONTHLY plans pay on the day they started and every 7/30 days
 // after (30-day month approximation - no plan currently seeded uses these,
-// only DAILY, so this is here for when an admin configures one).
-function isRewardDue(userPlan, referenceDate) {
-  if (!userPlan.started_at) return false;
-  const elapsed = daysSince(userPlan.started_at, referenceDate);
-  if (elapsed < 0) return false;
+// only DAILY, so this is here for when an admin configures one). Takes
+// `elapsed` rather than recomputing it, since the caller already needs it
+// for the duration/maturity check right before this.
+function isRewardDue(userPlan, elapsed) {
   switch (userPlan.plan_reward_frequency) {
     case 'DAILY':
       return true;
@@ -109,7 +108,28 @@ async function processDailyRewards(referenceDate = new Date()) {
   };
 
   for (const userPlan of userPlans) {
-    if (!isRewardDue(userPlan, referenceDate)) {
+    if (!userPlan.started_at) {
+      summary.skipped += 1;
+      continue; // eslint-disable-line no-continue
+    }
+
+    const elapsed = daysSince(userPlan.started_at, referenceDate);
+    if (elapsed < 0) {
+      summary.skipped += 1;
+      continue; // eslint-disable-line no-continue
+    }
+
+    // A plan with a duration_days cap (see PlansPage - all seeded plans
+    // are 40 days) stops paying once it matures; mark it COMPLETED instead
+    // of silently skipping forever, so it drops out of future runs' query.
+    if (userPlan.plan_duration_days && elapsed >= userPlan.plan_duration_days) {
+      // eslint-disable-next-line no-await-in-loop
+      await userPlanRepository.markCompletedIfActive(pool, userPlan.id, referenceDate);
+      summary.skipped += 1;
+      continue; // eslint-disable-line no-continue
+    }
+
+    if (!isRewardDue(userPlan, elapsed)) {
       summary.skipped += 1;
       continue; // eslint-disable-line no-continue
     }

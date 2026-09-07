@@ -11,10 +11,10 @@ export default function PrivacyPage() {
       </p>
 
       <h2>Information we collect</h2>
-      <p>Your full name, email, phone number, and (if provided) a referral code at registration; deposit and withdrawal details you submit, including payment method and account information you provide for withdrawals.</p>
+      <p>Your full name, mobile number, and (if provided) a referral code at registration; deposit and withdrawal details you submit, including payment method and account information you provide for withdrawals.</p>
 
       <h2>How we use your information</h2>
-      <p>To operate your account, process deposits and withdrawals, calculate rewards and referral commissions, and communicate with you about your account (such as password reset emails).</p>
+      <p>To operate your account, process deposits and withdrawals, calculate rewards and referral commissions, and communicate with you about your account (such as password reset links sent by SMS).</p>
 
       <h2>Data storage and security</h2>
       <p>Passwords are hashed and never stored in plain text. Access to administrative functions is restricted to authorized personnel, and all administrative actions are logged.</p>

@@ -177,3 +177,68 @@ export function GiftIcon(props) {
     </Icon>
   );
 }
+
+// --- Plan-card icon set (PlansPage/DepositPage) ---
+
+export function RocketIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2.5c2.8 1.6 4.5 4.6 4.5 8 0 2-.6 3.8-1.6 5.3L12 18l-2.9-2.2C8.1 14.3 7.5 12.5 7.5 10.5c0-3.4 1.7-6.4 4.5-8Z" />
+      <circle cx="12" cy="10" r="1.8" />
+      <path d="M9 15.5 6.5 18a3 3 0 0 0-.9 2.2v1.3l1.3-.4A3 3 0 0 0 9 19.2M15 15.5l2.5 2.5a3 3 0 0 1 .9 2.2v1.3l-1.3-.4A3 3 0 0 1 15 19.2" />
+    </Icon>
+  );
+}
+
+export function PieChartIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2.5a9.5 9.5 0 1 0 9.5 9.5H12V2.5Z" />
+      <path d="M15 2.9A9.5 9.5 0 0 1 21.1 9H15V2.9Z" />
+    </Icon>
+  );
+}
+
+export function DiamondIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 9 8 3.5h8L20 9l-8 11.5L4 9Z" />
+      <path d="M4 9h16M9.5 3.5 8 9l4 11.5 4-11.5-1.5-5.5" />
+    </Icon>
+  );
+}
+
+export function CrownIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="m3 8 3.5 3L12 5l5.5 6L21 8l-2 11H5L3 8Z" />
+      <path d="M5 19h14" />
+    </Icon>
+  );
+}
+
+export function StarIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="m12 3 2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3Z" />
+    </Icon>
+  );
+}
+
+export function BoltIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12.5 2 4 13.5h6L10 22l9-12.5h-6.5L12.5 2Z" />
+    </Icon>
+  );
+}
+
+export function CartIcon(props) {
+  return (
+    <Icon {...props}>
+      <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="17.5" cy="20" r="1.4" fill="currentColor" stroke="none" />
+      <path d="M2.5 3h2.3l2 12.2a2 2 0 0 0 2 1.7h8.4a2 2 0 0 0 2-1.6L21 7.5H6" />
+    </Icon>
+  );
+}

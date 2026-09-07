@@ -11,7 +11,6 @@ export default function RegisterPage() {
   const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
     fullName: '',
-    email: '',
     phone: '',
     password: '',
     referralCode: searchParams.get('ref') || '',
@@ -27,7 +26,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(form);
-      await login(form.email, form.password);
+      await login(form.phone, form.password);
       showToast('Account created - welcome!', 'success');
       navigate('/', { replace: true });
     } catch (err) {
@@ -45,10 +44,6 @@ export default function RegisterPage() {
         <label>
           Full name
           <input name="fullName" value={form.fullName} onChange={handleChange} required minLength={3} />
-        </label>
-        <label>
-          Email
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
         </label>
         <label>
           Mobile number

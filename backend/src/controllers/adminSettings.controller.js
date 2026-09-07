@@ -21,10 +21,13 @@ async function updateSettings(req, res, next) {
   }
 }
 
+// Admin accounts no longer carry an email address (login/registration is
+// phone-based), so the destination must be typed in rather than defaulted
+// to req.user.email.
 async function sendTestEmail(req, res, next) {
   try {
-    await mailService.sendTestEmail(req.user.email);
-    res.status(200).json({ success: true, message: `Test email sent to ${req.user.email}.` });
+    await mailService.sendTestEmail(req.body.to);
+    res.status(200).json({ success: true, message: `Test email sent to ${req.body.to}.` });
   } catch (error) {
     next(error);
   }

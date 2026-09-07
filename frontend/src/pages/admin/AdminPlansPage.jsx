@@ -4,8 +4,15 @@ import { formatCurrency } from '../../utils/format';
 
 const FREQUENCIES = ['DAILY', 'WEEKLY', 'MONTHLY'];
 const EMPTY_FORM = {
-  name: '', minAmount: '', maxAmount: '', rewardRate: '', rewardFrequency: 'DAILY', description: '', status: 'ACTIVE',
+  name: '', minAmount: '', maxAmount: '', rewardRate: '', rewardFrequency: 'DAILY', durationDays: '', description: '', status: 'ACTIVE',
 };
+
+// Fixed-amount plans (the norm here - see PlansPage) set minAmount ===
+// maxAmount; show that as one figure instead of a redundant "X - X" range.
+function formatAmountRange(plan) {
+  if (Number(plan.minAmount) === Number(plan.maxAmount)) return formatCurrency(plan.minAmount);
+  return `${formatCurrency(plan.minAmount)} - ${formatCurrency(plan.maxAmount)}`;
+}
 
 export default function AdminPlansPage() {
   const [plans, setPlans] = useState([]);
@@ -43,6 +50,7 @@ export default function AdminPlansPage() {
       maxAmount: plan.maxAmount,
       rewardRate: plan.rewardRate,
       rewardFrequency: plan.rewardFrequency,
+      durationDays: plan.durationDays || '',
       description: plan.description || '',
       status: plan.status,
     });
@@ -56,6 +64,14 @@ export default function AdminPlansPage() {
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
+  // A "fixed amount" plan is just minAmount === maxAmount - keep them in
+  // sync so admins don't have to type the same number twice for the usual
+  // case, but Max amount can still be edited afterward for a real range.
+  const handleMinAmountChange = (e) => {
+    const { value } = e.target;
+    setForm((f) => ({ ...f, minAmount: value, maxAmount: f.maxAmount === f.minAmount ? value : f.maxAmount }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -65,6 +81,7 @@ export default function AdminPlansPage() {
       minAmount: Number(form.minAmount),
       maxAmount: Number(form.maxAmount),
       rewardRate: Number(form.rewardRate),
+      durationDays: form.durationDays === '' ? undefined : Number(form.durationDays),
     };
     try {
       if (editingId) {
@@ -93,8 +110,14 @@ export default function AdminPlansPage() {
         <form className="card-form" onSubmit={handleSubmit}>
           <h2>{editingId ? 'Edit plan' : 'New plan'}</h2>
           <label>Name<input name="name" value={form.name} onChange={handleChange} required /></label>
-          <label>Min amount<input type="number" name="minAmount" value={form.minAmount} onChange={handleChange} required /></label>
-          <label>Max amount<input type="number" name="maxAmount" value={form.maxAmount} onChange={handleChange} required /></label>
+          <label>
+            Min amount (deposit amount, for a fixed plan)
+            <input type="number" name="minAmount" value={form.minAmount} onChange={handleMinAmountChange} required />
+          </label>
+          <label>
+            Max amount (same as min amount for a fixed plan)
+            <input type="number" name="maxAmount" value={form.maxAmount} onChange={handleChange} required />
+          </label>
           <label>
             Reward rate (%)
             <input type="number" step="0.01" name="rewardRate" value={form.rewardRate} onChange={handleChange} required />
@@ -104,6 +127,13 @@ export default function AdminPlansPage() {
             <select name="rewardFrequency" value={form.rewardFrequency} onChange={handleChange}>
               {FREQUENCIES.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
+          </label>
+          <label>
+            Duration (days, optional)
+            <input type="number" min="1" name="durationDays" value={form.durationDays} onChange={handleChange} placeholder="Leave blank for indefinite" />
+            <span className="setting-description">
+              Once a user_plan reaches this many days, it stops earning rewards automatically.
+            </span>
           </label>
           <label>Description<input name="description" value={form.description} onChange={handleChange} /></label>
           <label>
@@ -125,14 +155,15 @@ export default function AdminPlansPage() {
       {loading ? <p>Loading…</p> : (
         <div className="admin-table-wrapper">
           <table className="admin-table">
-            <thead><tr><th>Name</th><th>Range</th><th>Rate</th><th>Frequency</th><th>Status</th><th /></tr></thead>
+            <thead><tr><th>Name</th><th>Amount</th><th>Rate</th><th>Frequency</th><th>Duration</th><th>Status</th><th /></tr></thead>
             <tbody>
               {plans.map((p) => (
                 <tr key={p.id}>
                   <td>{p.name}</td>
-                  <td>{formatCurrency(p.minAmount)} - {formatCurrency(p.maxAmount)}</td>
+                  <td>{formatAmountRange(p)}</td>
                   <td>{p.rewardRate}%</td>
                   <td>{p.rewardFrequency}</td>
+                  <td>{p.durationDays ? `${p.durationDays} days` : 'Indefinite'}</td>
                   <td><span className={`status-badge status-${p.status.toLowerCase()}`}>{p.status}</span></td>
                   <td><button type="button" onClick={() => startEdit(p)}>Edit</button></td>
                 </tr>

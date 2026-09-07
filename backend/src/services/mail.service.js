@@ -41,38 +41,6 @@ async function getMailer() {
   return { transporter, from: config.from || 'no-reply@example.com' };
 }
 
-async function sendPasswordResetEmail(to, resetUrl) {
-  const mailer = await getMailer();
-  if (!mailer) {
-    console.log(`[DEV] Password reset link for ${to}: ${resetUrl}`);
-    return;
-  }
-
-  await mailer.transporter.sendMail({
-    from: mailer.from,
-    to,
-    subject: 'Reset your password',
-    text: `Use this link to reset your password (valid for ${env.auth.resetTokenExpiryMinutes} minutes): ${resetUrl}`,
-    html: `<p>Use this link to reset your password (valid for ${env.auth.resetTokenExpiryMinutes} minutes):</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
-  });
-}
-
-async function sendVerificationCodeEmail(to, code, expiryMinutes) {
-  const mailer = await getMailer();
-  if (!mailer) {
-    console.log(`[DEV] Email verification code for ${to}: ${code}`);
-    return;
-  }
-
-  await mailer.transporter.sendMail({
-    from: mailer.from,
-    to,
-    subject: 'Verify your email',
-    text: `Your verification code is ${code}. It expires in ${expiryMinutes} minutes.`,
-    html: `<p>Your verification code is:</p><p style="font-size:24px;font-weight:700;letter-spacing:4px;">${code}</p><p>It expires in ${expiryMinutes} minutes.</p>`,
-  });
-}
-
 async function sendTestEmail(to) {
   const mailer = await getMailer();
   if (!mailer) {
@@ -90,4 +58,4 @@ async function sendTestEmail(to) {
   });
 }
 
-module.exports = { sendPasswordResetEmail, sendVerificationCodeEmail, sendTestEmail };
+module.exports = { sendTestEmail };

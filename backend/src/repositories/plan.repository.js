@@ -20,23 +20,24 @@ async function getForUpdate(conn, id) {
 }
 
 async function create(conn, {
-  name, minAmount, maxAmount, rewardRate, rewardFrequency, description, status,
+  name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays, description, status,
 }) {
   const [result] = await conn.query(
-    `INSERT INTO plans (name, min_amount, max_amount, reward_rate, reward_frequency, description, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [name, minAmount, maxAmount, rewardRate, rewardFrequency, description || null, status],
+    `INSERT INTO plans (name, min_amount, max_amount, reward_rate, reward_frequency, duration_days, description, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays || null, description || null, status],
   );
   return result.insertId;
 }
 
 async function update(conn, id, {
-  name, minAmount, maxAmount, rewardRate, rewardFrequency, description, status,
+  name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays, description, status,
 }) {
   await conn.query(
-    `UPDATE plans SET name = ?, min_amount = ?, max_amount = ?, reward_rate = ?, reward_frequency = ?, description = ?, status = ?
+    `UPDATE plans SET name = ?, min_amount = ?, max_amount = ?, reward_rate = ?, reward_frequency = ?,
+       duration_days = ?, description = ?, status = ?
      WHERE id = ?`,
-    [name, minAmount, maxAmount, rewardRate, rewardFrequency, description || null, status, id],
+    [name, minAmount, maxAmount, rewardRate, rewardFrequency, durationDays || null, description || null, status, id],
   );
 }
 
@@ -49,6 +50,7 @@ function sanitizePlan(row) {
     maxAmount: row.max_amount,
     rewardRate: row.reward_rate,
     rewardFrequency: row.reward_frequency,
+    durationDays: row.duration_days,
     description: row.description,
     status: row.status,
     createdAt: row.created_at,

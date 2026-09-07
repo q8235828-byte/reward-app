@@ -74,7 +74,7 @@ export default function AdminWithdrawalsPage() {
             <tbody>
               {items.map((w) => (
                 <tr key={w.id}>
-                  <td>{w.userFullName}<br /><span className="muted">{w.userEmail}</span></td>
+                  <td>{w.userFullName}<br /><span className="muted">{w.userPhone}</span></td>
                   <td>{formatCurrency(w.amount)}</td>
                   <td>{w.paymentMethod}</td>
                   <td>{w.accountName}<br /><span className="muted">{w.accountNumber}</span></td>

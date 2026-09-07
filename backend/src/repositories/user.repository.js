@@ -1,8 +1,3 @@
-async function findByEmail(conn, email) {
-  const [rows] = await conn.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
-  return rows[0] || null;
-}
-
 async function findByPhone(conn, phone) {
   const [rows] = await conn.query('SELECT * FROM users WHERE phone = ? LIMIT 1', [phone]);
   return rows[0] || null;
@@ -27,9 +22,9 @@ function buildAdminFilterClause({ search, status }) {
   const conditions = [];
   const params = [];
   if (search) {
-    conditions.push('(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR referral_code LIKE ?)');
+    conditions.push('(full_name LIKE ? OR phone LIKE ? OR referral_code LIKE ?)');
     const like = `%${search}%`;
-    params.push(like, like, like, like);
+    params.push(like, like, like);
   }
   if (status) {
     conditions.push('status = ?');
@@ -66,12 +61,12 @@ async function referralCodeExists(conn, referralCode) {
 }
 
 async function createUser(conn, {
-  fullName, email, phone, passwordHash, referralCode, referredBy,
+  fullName, phone, passwordHash, referralCode, referredBy,
 }) {
   const [result] = await conn.query(
-    `INSERT INTO users (full_name, email, phone, password_hash, referral_code, referred_by, role, status)
-     VALUES (?, ?, ?, ?, ?, ?, 'USER', 'ACTIVE')`,
-    [fullName, email, phone, passwordHash, referralCode, referredBy],
+    `INSERT INTO users (full_name, phone, password_hash, referral_code, referred_by, role, status)
+     VALUES (?, ?, ?, ?, ?, 'USER', 'ACTIVE')`,
+    [fullName, phone, passwordHash, referralCode, referredBy],
   );
   return result.insertId;
 }
@@ -91,34 +86,22 @@ async function incrementTokenVersion(conn, userId) {
   await conn.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [userId]);
 }
 
-async function markEmailVerified(conn, userId) {
-  await conn.query('UPDATE users SET email_verified_at = NOW() WHERE id = ?', [userId]);
-}
-
-async function markPhoneVerified(conn, userId) {
-  await conn.query('UPDATE users SET phone_verified_at = NOW() WHERE id = ?', [userId]);
-}
-
 function sanitizeUser(row) {
   if (!row) return null;
   return {
     id: row.id,
     fullName: row.full_name,
-    email: row.email,
     phone: row.phone,
     referralCode: row.referral_code,
     referredBy: row.referred_by,
     role: row.role,
     status: row.status,
-    emailVerifiedAt: row.email_verified_at,
-    phoneVerifiedAt: row.phone_verified_at,
     lastLogin: row.last_login,
     createdAt: row.created_at,
   };
 }
 
 module.exports = {
-  findByEmail,
   findByPhone,
   findByReferralCode,
   findById,
@@ -131,7 +114,5 @@ module.exports = {
   updateLastLogin,
   updatePasswordHash,
   incrementTokenVersion,
-  markEmailVerified,
-  markPhoneVerified,
   sanitizeUser,
 };

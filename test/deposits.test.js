@@ -10,15 +10,15 @@ const app = require('../backend/src/app');
 beforeEach(async () => { await truncateAll(); });
 after(async () => { await closeDb(); });
 
-async function getStarterPlan() {
-  const [rows] = await pool.query("SELECT * FROM plans WHERE name = 'Starter' LIMIT 1");
-  if (!rows[0]) throw new Error('Starter plan not found - did you import database/seed.sql into the test database?');
+async function getFirstPlan() {
+  const [rows] = await pool.query("SELECT * FROM plans WHERE name = 'Plan.1' LIMIT 1");
+  if (!rows[0]) throw new Error('Plan.1 not found - did you import database/seed.sql into the test database?');
   return rows[0];
 }
 
-test('deposit amount outside the plan range is rejected', async () => {
+test('deposit amount other than the plan\'s fixed amount is rejected', async () => {
   const client = await createAuthenticatedClient(app);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
 
   const res = await client.post('/api/deposits').send({ planId: plan.id, amount: 10, paymentMethod: 'JAZZCASH' });
   assert.equal(res.status, 400);
@@ -27,9 +27,9 @@ test('deposit amount outside the plan range is rejected', async () => {
 
 test('deposit creation succeeds and starts PENDING with payment instructions', async () => {
   const client = await createAuthenticatedClient(app);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
 
-  const res = await client.post('/api/deposits').send({ planId: plan.id, amount: 1000, paymentMethod: 'JAZZCASH' });
+  const res = await client.post('/api/deposits').send({ planId: plan.id, amount: Number(plan.min_amount), paymentMethod: 'JAZZCASH' });
   assert.equal(res.status, 201);
   assert.equal(res.body.data.deposit.status, 'PENDING');
   assert.equal(res.body.data.paymentInstructions.method, 'JAZZCASH');
@@ -37,9 +37,9 @@ test('deposit creation succeeds and starts PENDING with payment instructions', a
 
 test('submitting a transaction reference moves the deposit to UNDER_REVIEW', async () => {
   const client = await createAuthenticatedClient(app);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
 
-  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: 1000, paymentMethod: 'JAZZCASH' });
+  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: Number(plan.min_amount), paymentMethod: 'JAZZCASH' });
   const depositId = created.body.data.deposit.id;
 
   const res = await client.post(`/api/deposits/${depositId}/reference`).send({ transactionReference: 'TXN123456' });
@@ -51,9 +51,10 @@ test('submitting a transaction reference moves the deposit to UNDER_REVIEW', asy
 test('approving a deposit credits the wallet and activates a plan', async () => {
   const client = await createAuthenticatedClient(app);
   const admin = await createAdminClient(app, pool);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
+  const amount = Number(plan.min_amount);
 
-  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: 1000, paymentMethod: 'JAZZCASH' });
+  const created = await client.post('/api/deposits').send({ planId: plan.id, amount, paymentMethod: 'JAZZCASH' });
   const depositId = created.body.data.deposit.id;
 
   const approved = await admin.post(`/api/admin/deposits/${depositId}/approve`).send({});
@@ -61,20 +62,21 @@ test('approving a deposit credits the wallet and activates a plan', async () => 
   assert.equal(approved.body.data.deposit.status, 'APPROVED');
 
   const wallet = await walletService.getWalletByUserId(client.userId);
-  assert.equal(Number(wallet.depositBalance), 1000);
+  assert.equal(Number(wallet.depositBalance), amount);
 
   const [userPlans] = await pool.query('SELECT * FROM user_plans WHERE user_id = ?', [client.userId]);
   assert.equal(userPlans.length, 1);
   assert.equal(userPlans[0].status, 'ACTIVE');
-  assert.equal(Number(userPlans[0].amount), 1000);
+  assert.equal(Number(userPlans[0].amount), amount);
 });
 
 test('CRITICAL: approving the same deposit twice only credits the wallet once', async () => {
   const client = await createAuthenticatedClient(app);
   const admin = await createAdminClient(app, pool);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
+  const amount = Number(plan.min_amount);
 
-  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: 1000, paymentMethod: 'JAZZCASH' });
+  const created = await client.post('/api/deposits').send({ planId: plan.id, amount, paymentMethod: 'JAZZCASH' });
   const depositId = created.body.data.deposit.id;
 
   const first = await admin.post(`/api/admin/deposits/${depositId}/approve`).send({});
@@ -83,7 +85,7 @@ test('CRITICAL: approving the same deposit twice only credits the wallet once', 
   assert.equal(second.status, 200, 'a repeat approval must be a safe no-op, not an error');
 
   const wallet = await walletService.getWalletByUserId(client.userId);
-  assert.equal(Number(wallet.depositBalance), 1000, 'wallet must not be double-credited');
+  assert.equal(Number(wallet.depositBalance), amount, 'wallet must not be double-credited');
 
   const [rows] = await pool.query(
     "SELECT COUNT(*) AS count FROM wallet_transactions WHERE user_id = ? AND type = 'DEPOSIT'",
@@ -98,9 +100,9 @@ test('CRITICAL: approving the same deposit twice only credits the wallet once', 
 test('rejecting a deposit does not credit the wallet or activate a plan', async () => {
   const client = await createAuthenticatedClient(app);
   const admin = await createAdminClient(app, pool);
-  const plan = await getStarterPlan();
+  const plan = await getFirstPlan();
 
-  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: 1000, paymentMethod: 'JAZZCASH' });
+  const created = await client.post('/api/deposits').send({ planId: plan.id, amount: Number(plan.min_amount), paymentMethod: 'JAZZCASH' });
   const depositId = created.body.data.deposit.id;
 
   const rejected = await admin.post(`/api/admin/deposits/${depositId}/reject`).send({ note: 'fake reference' });

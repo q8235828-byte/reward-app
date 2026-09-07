@@ -56,17 +56,6 @@ const cronLimiter = rateLimit({
   message: { success: false, message: 'Too many requests to this endpoint.', code: 'RATE_LIMITED' },
 });
 
-// The service layer already enforces a resend cooldown per channel; this
-// is the outer guard against hammering the endpoint itself.
-const verificationLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: skipInTests,
-  message: { success: false, message: 'Too many verification requests. Please try again later.', code: 'RATE_LIMITED' },
-});
-
 module.exports = {
-  authLimiter, passwordResetLimiter, depositLimiter, withdrawalLimiter, cronLimiter, verificationLimiter,
+  authLimiter, passwordResetLimiter, depositLimiter, withdrawalLimiter, cronLimiter,
 };

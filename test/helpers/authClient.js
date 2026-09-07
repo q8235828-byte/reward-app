@@ -5,11 +5,10 @@ const request = require('supertest');
 // exactly what the frontend does (frontend/src/services/api.js) - so
 // these tests exercise the real CSRF enforcement instead of bypassing it.
 async function createAuthenticatedClient(app, overrides = {}) {
-  const unique = `${Date.now()}${Math.random().toString(16).slice(2)}`;
+  const unique = String(Math.floor(100000000 + Math.random() * 899999999));
   const payload = {
     fullName: 'Test User',
-    email: `user${unique}@example.com`,
-    phone: `03${String(Math.floor(100000000 + Math.random() * 899999999))}`,
+    phone: `03${unique}`,
     password: 'password123',
     ...overrides,
   };
@@ -20,7 +19,7 @@ async function createAuthenticatedClient(app, overrides = {}) {
   }
 
   const loginRes = await request(app).post('/api/auth/login').send({
-    email: payload.email, password: payload.password,
+    phone: payload.phone, password: payload.password,
   });
   if (loginRes.status !== 200) {
     throw new Error(`Test helper login failed: ${JSON.stringify(loginRes.body)}`);
@@ -35,7 +34,7 @@ async function createAuthenticatedClient(app, overrides = {}) {
 
   return {
     userId: registerRes.body.data.user.id,
-    email: payload.email,
+    phone: payload.phone,
     referralCode: registerRes.body.data.user.referralCode,
     cookieHeader,
     csrfToken,

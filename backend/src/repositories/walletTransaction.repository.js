@@ -62,7 +62,7 @@ function sanitizeTransaction(row) {
     id: row.id,
     userId: row.user_id,
     userFullName: row.user_full_name,
-    userEmail: row.user_email,
+    userPhone: row.user_phone,
     type: row.type,
     amount: row.amount,
     balanceBefore: row.balance_before,
@@ -91,7 +91,7 @@ async function listAllAdmin(conn, {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const offset = (page - 1) * pageSize;
   const [rows] = await conn.query(
-    `SELECT wt.*, u.full_name AS user_full_name, u.email AS user_email
+    `SELECT wt.*, u.full_name AS user_full_name, u.phone AS user_phone
      FROM wallet_transactions wt
      JOIN users u ON u.id = wt.user_id
      ${where}

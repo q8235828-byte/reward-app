@@ -93,7 +93,6 @@ export default function AdminUserDetailPage() {
       <section className="admin-card">
         <h2>Profile</h2>
         <dl className="detail-list">
-          <div><dt>Email</dt><dd>{user.email}</dd></div>
           <div><dt>Phone</dt><dd>{user.phone}</dd></div>
           <div><dt>Referral code</dt><dd>{user.referralCode}</dd></div>
           <div><dt>Role</dt><dd>{user.role}</dd></div>

@@ -67,7 +67,11 @@ export default function LandingPage() {
             {plans.map((plan) => (
               <div className="plan-card" key={plan.id}>
                 <h2>{plan.name}</h2>
-                <p className="plan-range">{formatCurrency(plan.minAmount)} - {formatCurrency(plan.maxAmount)}</p>
+                <p className="plan-range">
+                  {Number(plan.minAmount) === Number(plan.maxAmount)
+                    ? formatCurrency(plan.minAmount)
+                    : `${formatCurrency(plan.minAmount)} - ${formatCurrency(plan.maxAmount)}`}
+                </p>
                 <p className="plan-rate">{plan.rewardRate}% {plan.rewardFrequency.toLowerCase()} reward</p>
                 {plan.description && <p className="plan-description">{plan.description}</p>}
               </div>

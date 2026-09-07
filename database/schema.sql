@@ -13,7 +13,6 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   full_name VARCHAR(150) NOT NULL,
-  email VARCHAR(191) NOT NULL,
   phone VARCHAR(20) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   token_version INT UNSIGNED NOT NULL DEFAULT 0,
@@ -21,13 +20,10 @@ CREATE TABLE IF NOT EXISTS users (
   referred_by BIGINT UNSIGNED DEFAULT NULL,
   role ENUM('USER','ADMIN','SUPER_ADMIN') NOT NULL DEFAULT 'USER',
   status ENUM('ACTIVE','SUSPENDED','BLOCKED','PENDING') NOT NULL DEFAULT 'PENDING',
-  email_verified_at DATETIME DEFAULT NULL,
-  phone_verified_at DATETIME DEFAULT NULL,
   last_login DATETIME DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_users_email (email),
   UNIQUE KEY uq_users_phone (phone),
   UNIQUE KEY uq_users_referral_code (referral_code),
   KEY idx_users_referred_by (referred_by),
@@ -36,7 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- ---------------------------------------------------------------------
 -- password_reset_tokens
--- token_hash stores SHA-256 of the raw token emailed to the user - the
+-- token_hash stores SHA-256 of the raw token texted to the user - the
 -- raw value is never persisted, matching the password hashing principle.
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -50,26 +46,6 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   UNIQUE KEY uq_password_reset_tokens_hash (token_hash),
   KEY idx_password_reset_tokens_user (user_id),
   CONSTRAINT fk_password_reset_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ---------------------------------------------------------------------
--- verification_codes
--- Short numeric OTP codes for email/phone verification. code_hash stores
--- SHA-256 of the code - like password_reset_tokens, the raw code is never
--- persisted. attempts caps brute-force guessing of a 6-digit code.
--- ---------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS verification_codes (
-  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  user_id BIGINT UNSIGNED NOT NULL,
-  channel ENUM('EMAIL','PHONE') NOT NULL,
-  code_hash CHAR(64) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  used_at DATETIME DEFAULT NULL,
-  attempts INT UNSIGNED NOT NULL DEFAULT 0,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  KEY idx_verification_codes_user_channel (user_id, channel),
-  CONSTRAINT fk_verification_codes_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
@@ -115,6 +91,10 @@ CREATE TABLE IF NOT EXISTS wallet_transactions (
 -- ---------------------------------------------------------------------
 -- plans
 -- ---------------------------------------------------------------------
+-- min_amount/max_amount are kept equal for a fixed-amount plan (the norm
+-- for this app - see PlansPage) rather than adding a separate `amount`
+-- column; PlanService.validateDepositAmount already enforces an exact
+-- match when min = max, so no service-layer change was needed for that.
 CREATE TABLE IF NOT EXISTS plans (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
@@ -122,6 +102,7 @@ CREATE TABLE IF NOT EXISTS plans (
   max_amount DECIMAL(14,2) NOT NULL,
   reward_rate DECIMAL(6,4) NOT NULL COMMENT 'percentage, e.g. 5.0000 = 5%',
   reward_frequency ENUM('DAILY','WEEKLY','MONTHLY') NOT NULL DEFAULT 'DAILY',
+  duration_days INT UNSIGNED DEFAULT NULL COMMENT 'Number of days the plan pays rewards for. NULL = indefinite (until admin cancels).',
   description TEXT,
   status ENUM('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

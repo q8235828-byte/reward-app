@@ -46,7 +46,7 @@ export default function AdminTransactionsPage() {
             <tbody>
               {items.map((t) => (
                 <tr key={t.id}>
-                  <td>{t.userFullName}<br /><span className="muted">{t.userEmail}</span></td>
+                  <td>{t.userFullName}<br /><span className="muted">{t.userPhone}</span></td>
                   <td>{t.type.replace('_', ' ')}</td>
                   <td className={Number(t.amount) < 0 ? 'amount-negative' : 'amount-positive'}>{formatCurrency(t.amount)}</td>
                   <td><span className={`status-badge status-${t.status.toLowerCase()}`}>{t.status}</span></td>

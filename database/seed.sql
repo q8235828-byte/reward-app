@@ -6,14 +6,23 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- Plans (exactly 5, overall range Rs. 250 - Rs. 25,000)
+-- Plans (exactly 12, each a fixed deposit amount - min_amount = max_amount
+-- so PlanService.validateDepositAmount enforces an exact match. All pay a
+-- flat 5% daily reward for 40 days; tune per-plan from the admin panel.
 -- ---------------------------------------------------------------------
-INSERT INTO plans (name, min_amount, max_amount, reward_rate, reward_frequency, description, status) VALUES
-('Starter',  250.00,   2500.00,  5.0000, 'DAILY', 'Entry-level plan for new members.', 'ACTIVE'),
-('Bronze',   2501.00,  7500.00,  5.0000, 'DAILY', 'For members ready to grow their deposit.', 'ACTIVE'),
-('Silver',   7501.00,  12500.00, 5.0000, 'DAILY', 'Mid-tier plan with higher deposit range.', 'ACTIVE'),
-('Gold',     12501.00, 20000.00, 5.0000, 'DAILY', 'High-tier plan for larger deposits.', 'ACTIVE'),
-('Platinum', 20001.00, 25000.00, 5.0000, 'DAILY', 'Top-tier plan, maximum deposit range.', 'ACTIVE');
+INSERT INTO plans (name, min_amount, max_amount, reward_rate, reward_frequency, duration_days, description, status) VALUES
+('Plan.1',  299.00,   299.00,   5.0000, 'DAILY', 40, 'Entry-level fixed plan.', 'ACTIVE'),
+('Plan.2',  999.00,   999.00,   5.0000, 'DAILY', 40, 'Fixed plan for members ready to grow their deposit.', 'ACTIVE'),
+('Plan.3',  1999.00,  1999.00,  5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.4',  2999.00,  2999.00,  5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.5',  4199.00,  4199.00,  5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.6',  6599.00,  6599.00,  5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.7',  9999.00,  9999.00,  5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.8',  16999.00, 16999.00, 5.0000, 'DAILY', 40, 'Fixed plan with a higher deposit tier.', 'ACTIVE'),
+('Plan.9',  36999.00, 36999.00, 5.0000, 'DAILY', 40, 'Fixed plan for larger deposits.', 'ACTIVE'),
+('Plan.10', 49999.00, 49999.00, 5.0000, 'DAILY', 40, 'Fixed plan for larger deposits.', 'ACTIVE'),
+('Plan.11', 74999.00, 74999.00, 5.0000, 'DAILY', 40, 'Fixed plan for larger deposits.', 'ACTIVE'),
+('Plan.12', 98999.00, 98999.00, 5.0000, 'DAILY', 40, 'Top-tier fixed plan, maximum deposit.', 'ACTIVE');
 
 -- ---------------------------------------------------------------------
 -- App settings (all business rules, per PMD section 35)
@@ -47,5 +56,5 @@ INSERT INTO app_settings (setting_key, setting_value, description) VALUES
 -- e.g. via: node -e "console.log(require('bcrypt').hashSync('your-password', 10))"
 -- then paste the resulting hash below before running this insert.
 -- ---------------------------------------------------------------------
--- INSERT INTO users (full_name, email, phone, password_hash, referral_code, role, status)
--- VALUES ('Admin User', 'admin@example.com', '03000000000', '<bcrypt-hash-here>', 'ADMIN0001', 'SUPER_ADMIN', 'ACTIVE');
+-- INSERT INTO users (full_name, phone, password_hash, referral_code, role, status)
+-- VALUES ('Admin User', '03000000000', '<bcrypt-hash-here>', 'ADMIN0001', 'SUPER_ADMIN', 'ACTIVE');

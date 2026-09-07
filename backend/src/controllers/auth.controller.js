@@ -72,7 +72,7 @@ async function changePassword(req, res, next) {
 async function requestPasswordReset(req, res, next) {
   try {
     await authService.requestPasswordReset(req.body);
-    res.status(200).json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+    res.status(200).json({ success: true, message: 'If that phone number is registered, a reset link has been sent via SMS.' });
   } catch (error) {
     next(error);
   }

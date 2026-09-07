@@ -23,7 +23,7 @@ async function create(conn, {
 async function listAllAdmin(conn, { page, pageSize }) {
   const offset = (page - 1) * pageSize;
   const [rows] = await conn.query(
-    `SELECT rl.*, u.full_name AS user_full_name, u.email AS user_email
+    `SELECT rl.*, u.full_name AS user_full_name, u.phone AS user_phone
      FROM reward_ledger rl
      JOIN users u ON u.id = rl.user_id
      ORDER BY rl.reward_date DESC, rl.id DESC
@@ -44,7 +44,7 @@ function sanitizeRewardLedgerAdmin(row) {
     id: row.id,
     userId: row.user_id,
     userFullName: row.user_full_name,
-    userEmail: row.user_email,
+    userPhone: row.user_phone,
     userPlanId: row.user_plan_id,
     rewardDate: row.reward_date,
     eligibleAmount: row.eligible_amount,

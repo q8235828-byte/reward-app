@@ -31,7 +31,7 @@ export default function AdminRewardsPage() {
             <tbody>
               {items.map((r) => (
                 <tr key={r.id}>
-                  <td>{r.userFullName}<br /><span className="muted">{r.userEmail}</span></td>
+                  <td>{r.userFullName}<br /><span className="muted">{r.userPhone}</span></td>
                   <td>#{r.userPlanId}</td>
                   <td>{r.rewardDate}</td>
                   <td>{formatCurrency(r.eligibleAmount)}</td>
