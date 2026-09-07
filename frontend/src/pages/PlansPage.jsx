@@ -35,7 +35,7 @@ export default function PlansPage() {
 
       {error && <p className="form-error">{error}</p>}
       {loading ? <p>Loading…</p> : (
-        <div className="plan-dark-grid">
+        <div className="plan-fixed-grid">
           {plans.map((plan, index) => {
             const PlanIcon = PLAN_ICONS[index % PLAN_ICONS.length];
             const isFixed = Number(plan.minAmount) === Number(plan.maxAmount);
@@ -43,45 +43,45 @@ export default function PlansPage() {
             const totalReturn = plan.durationDays ? dailyProfit * plan.durationDays : null;
 
             return (
-              <div className="plan-dark-card" key={plan.id}>
-                <div className="plan-dark-card-head">
-                  <span className="plan-dark-icon"><PlanIcon size={20} /></span>
+              <div className="plan-fixed-card" key={plan.id}>
+                <div className="plan-fixed-card-head">
+                  <span className="plan-fixed-icon"><PlanIcon size={20} /></span>
                   <h2>{plan.name}</h2>
-                  <span className="plan-dark-badge">{isFixed ? 'Fixed Amount' : 'Amount range'}</span>
+                  <span className="plan-fixed-badge">{isFixed ? 'Fixed Amount' : 'Amount range'}</span>
                 </div>
 
-                <div className="plan-dark-amount">
-                  <span className="plan-dark-amount-value">{formatCurrency(plan.minAmount)}</span>
-                  <span className="plan-dark-amount-label">
+                <div className="plan-fixed-amount">
+                  <span className="plan-fixed-amount-value">{formatCurrency(plan.minAmount)}</span>
+                  <span className="plan-fixed-amount-label">
                     {isFixed ? 'Minimum investment' : `up to ${formatCurrency(plan.maxAmount)}`}
                   </span>
                 </div>
 
-                <div className="plan-dark-stats">
-                  <div className="plan-dark-stat">
-                    <span className="plan-dark-stat-label">Daily profit</span>
-                    <span className="plan-dark-stat-value">{formatCurrency(dailyProfit)}</span>
+                <div className="plan-fixed-stats">
+                  <div className="plan-fixed-stat">
+                    <span className="plan-fixed-stat-label">Daily profit</span>
+                    <span className="plan-fixed-stat-value">{formatCurrency(dailyProfit)}</span>
                   </div>
-                  <div className="plan-dark-stat">
-                    <span className="plan-dark-stat-label">Duration</span>
-                    <span className="plan-dark-stat-value">{plan.durationDays ? `${plan.durationDays} Days` : 'Indefinite'}</span>
+                  <div className="plan-fixed-stat">
+                    <span className="plan-fixed-stat-label">Duration</span>
+                    <span className="plan-fixed-stat-value">{plan.durationDays ? `${plan.durationDays} Days` : 'Indefinite'}</span>
                   </div>
-                  <div className="plan-dark-stat">
-                    <span className="plan-dark-stat-label">Total return</span>
-                    <span className="plan-dark-stat-value">{totalReturn !== null ? formatCurrency(totalReturn) : '—'}</span>
+                  <div className="plan-fixed-stat">
+                    <span className="plan-fixed-stat-label">Total return</span>
+                    <span className="plan-fixed-stat-value">{totalReturn !== null ? formatCurrency(totalReturn) : '—'}</span>
                   </div>
-                  <div className="plan-dark-stat">
-                    <span className="plan-dark-stat-label">Interval</span>
-                    <span className="plan-dark-stat-value">
+                  <div className="plan-fixed-stat">
+                    <span className="plan-fixed-stat-label">Interval</span>
+                    <span className="plan-fixed-stat-value">
                       {INTERVAL_LABEL[plan.rewardFrequency] || plan.rewardFrequency}
                       <small> ({plan.rewardRate}% {plan.rewardFrequency.toLowerCase()})</small>
                     </span>
                   </div>
                 </div>
 
-                {plan.description && <p className="plan-dark-description">{plan.description}</p>}
+                {plan.description && <p className="plan-fixed-description">{plan.description}</p>}
 
-                <Link to={`/deposit?planId=${plan.id}`} className="plan-dark-cta">
+                <Link to={`/deposit?planId=${plan.id}`} className="plan-fixed-cta">
                   <CartIcon size={16} />
                   Invest Now
                 </Link>
