@@ -72,7 +72,7 @@ export default function LandingPage() {
                     ? formatCurrency(plan.minAmount)
                     : `${formatCurrency(plan.minAmount)} - ${formatCurrency(plan.maxAmount)}`}
                 </p>
-                <p className="plan-rate">{plan.rewardRate}% {plan.rewardFrequency.toLowerCase()} reward</p>
+                <p className="plan-rate">{Number(plan.rewardRate)}% {plan.rewardFrequency.toLowerCase()} reward</p>
                 {plan.description && <p className="plan-description">{plan.description}</p>}
               </div>
             ))}

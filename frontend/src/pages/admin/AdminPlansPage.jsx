@@ -161,7 +161,7 @@ export default function AdminPlansPage() {
                 <tr key={p.id}>
                   <td>{p.name}</td>
                   <td>{formatAmountRange(p)}</td>
-                  <td>{p.rewardRate}%</td>
+                  <td>{Number(p.rewardRate)}%</td>
                   <td>{p.rewardFrequency}</td>
                   <td>{p.durationDays ? `${p.durationDays} days` : 'Indefinite'}</td>
                   <td><span className={`status-badge status-${p.status.toLowerCase()}`}>{p.status}</span></td>

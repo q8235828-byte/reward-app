@@ -10,12 +10,6 @@ import {
 // purely decorative, no meaning tied to a specific plan.
 const PLAN_ICONS = [RocketIcon, PieChartIcon, DiamondIcon, CrownIcon, StarIcon, BoltIcon];
 
-const INTERVAL_LABEL = {
-  DAILY: 'Every 24 Hours',
-  WEEKLY: 'Every 7 Days',
-  MONTHLY: 'Every 30 Days',
-};
-
 export default function PlansPage() {
   const [plans, setPlans] = useState([]);
   const [error, setError] = useState('');
@@ -39,15 +33,18 @@ export default function PlansPage() {
           {plans.map((plan, index) => {
             const PlanIcon = PLAN_ICONS[index % PLAN_ICONS.length];
             const isFixed = Number(plan.minAmount) === Number(plan.maxAmount);
-            const dailyProfit = (Number(plan.minAmount) * Number(plan.rewardRate)) / 100;
+            const rewardRate = Number(plan.rewardRate);
+            const dailyProfit = (Number(plan.minAmount) * rewardRate) / 100;
             const totalReturn = plan.durationDays ? dailyProfit * plan.durationDays : null;
 
             return (
               <div className="plan-fixed-card" key={plan.id}>
                 <div className="plan-fixed-card-head">
                   <span className="plan-fixed-icon"><PlanIcon size={20} /></span>
-                  <h2>{plan.name}</h2>
-                  <span className="plan-fixed-badge">{isFixed ? 'Fixed Amount' : 'Amount range'}</span>
+                  <div className="plan-fixed-card-title">
+                    <h2>{plan.name}</h2>
+                    <span className="plan-fixed-badge">{isFixed ? 'Fixed Amount' : 'Amount range'}</span>
+                  </div>
                 </div>
 
                 <div className="plan-fixed-amount">
@@ -58,24 +55,21 @@ export default function PlansPage() {
                 </div>
 
                 <div className="plan-fixed-stats">
-                  <div className="plan-fixed-stat">
-                    <span className="plan-fixed-stat-label">Daily profit</span>
-                    <span className="plan-fixed-stat-value">{formatCurrency(dailyProfit)}</span>
+                  <div className="plan-fixed-stat-row">
+                    <span>Daily profit</span>
+                    <strong>{formatCurrency(dailyProfit)}</strong>
                   </div>
-                  <div className="plan-fixed-stat">
-                    <span className="plan-fixed-stat-label">Duration</span>
-                    <span className="plan-fixed-stat-value">{plan.durationDays ? `${plan.durationDays} Days` : 'Indefinite'}</span>
+                  <div className="plan-fixed-stat-row">
+                    <span>Duration</span>
+                    <strong>{plan.durationDays ? `${plan.durationDays} days` : 'Indefinite'}</strong>
                   </div>
-                  <div className="plan-fixed-stat">
-                    <span className="plan-fixed-stat-label">Total return</span>
-                    <span className="plan-fixed-stat-value">{totalReturn !== null ? formatCurrency(totalReturn) : '—'}</span>
+                  <div className="plan-fixed-stat-row">
+                    <span>Total return</span>
+                    <strong>{totalReturn !== null ? formatCurrency(totalReturn) : '—'}</strong>
                   </div>
-                  <div className="plan-fixed-stat">
-                    <span className="plan-fixed-stat-label">Interval</span>
-                    <span className="plan-fixed-stat-value">
-                      {INTERVAL_LABEL[plan.rewardFrequency] || plan.rewardFrequency}
-                      <small> ({plan.rewardRate}% {plan.rewardFrequency.toLowerCase()})</small>
-                    </span>
+                  <div className="plan-fixed-stat-row">
+                    <span>Reward rate</span>
+                    <strong>{rewardRate}% {plan.rewardFrequency.toLowerCase()}</strong>
                   </div>
                 </div>
 

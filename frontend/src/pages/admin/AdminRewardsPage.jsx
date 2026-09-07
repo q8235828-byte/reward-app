@@ -35,7 +35,7 @@ export default function AdminRewardsPage() {
                   <td>#{r.userPlanId}</td>
                   <td>{r.rewardDate}</td>
                   <td>{formatCurrency(r.eligibleAmount)}</td>
-                  <td>{r.rewardRate}%</td>
+                  <td>{Number(r.rewardRate)}%</td>
                   <td>{formatCurrency(r.rewardAmount)}</td>
                 </tr>
               ))}

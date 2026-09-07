@@ -204,36 +204,38 @@
 
   /* --- Plans page: fixed-amount cards ---
      Same light teal look as the rest of the app (.plan-card, .plan-rate,
-     .action-button, etc.) - just a richer layout for the extra stats a
-     fixed-amount plan carries (daily profit, duration, total return). */
+     .action-button, etc.). Stats are a plain divided list (not four boxed
+     tiles) - lighter, and immune to the label-wrapping/badge-wrapping
+     cramping that shows up once a card gets narrow (small phones, 3-up
+     desktop). */
 
   .plan-fixed-grid {
     @apply grid grid-cols-3 gap-4 items-start max-[860px]:grid-cols-2 max-[560px]:grid-cols-1;
   }
   .plan-fixed-card {
-    @apply bg-white border border-slate-200 rounded-3xl px-5 py-5 shadow-card transition
-      hover:shadow-card-lg hover:-translate-y-0.5 flex flex-col gap-4;
+    @apply bg-white border border-slate-200 rounded-2xl px-4.5 py-4.5 shadow-card transition
+      hover:shadow-card-lg hover:-translate-y-0.5 flex flex-col gap-3.5;
   }
-  .plan-fixed-card-head { @apply flex items-center gap-3; }
+  .plan-fixed-card-head { @apply flex items-start gap-3; }
   .plan-fixed-icon {
     @apply flex items-center justify-center w-10 h-10 rounded-full shrink-0 text-white
       bg-gradient-to-br from-brand-500 to-brand-700;
   }
-  .plan-fixed-card-head h2 { @apply flex-1 text-base mb-0; }
+  .plan-fixed-card-title { @apply flex flex-col items-start gap-1 min-w-0; }
+  .plan-fixed-card-title h2 { @apply text-base mb-0; }
   .plan-fixed-badge {
-    @apply text-[0.7rem] font-bold uppercase tracking-wide text-brand-700 bg-brand-50
-      border border-brand-100 rounded-full px-2.5 py-1;
+    @apply text-[0.66rem] font-bold uppercase tracking-wide text-brand-700 bg-brand-50
+      border border-brand-100 rounded-full px-2 py-0.5 whitespace-nowrap;
   }
   .plan-fixed-amount { @apply flex flex-col gap-0.5; }
   .plan-fixed-amount-value { @apply text-2xl font-extrabold text-slate-900; }
   .plan-fixed-amount-label { @apply text-xs text-slate-500 font-medium; }
-  .plan-fixed-stats { @apply grid grid-cols-2 gap-2.5; }
-  .plan-fixed-stat {
-    @apply bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 flex flex-col gap-1;
+  .plan-fixed-stats { @apply flex flex-col; }
+  .plan-fixed-stat-row {
+    @apply flex items-center justify-between gap-3 text-sm py-2 border-b border-slate-100 last:border-0;
   }
-  .plan-fixed-stat-label { @apply text-[0.68rem] uppercase tracking-wide text-slate-500 font-semibold; }
-  .plan-fixed-stat-value { @apply text-sm font-bold text-slate-900; }
-  .plan-fixed-stat-value small { @apply block text-[0.68rem] font-medium text-slate-500 normal-case; }
+  .plan-fixed-stat-row span { @apply text-slate-500 font-medium; }
+  .plan-fixed-stat-row strong { @apply text-slate-900 font-bold text-right; }
   .plan-fixed-description { @apply text-sm text-slate-500 leading-relaxed; }
   .plan-fixed-cta {
     @apply flex items-center justify-center gap-2 border-0 rounded-xl px-4 py-3 font-bold text-sm text-white

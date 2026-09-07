@@ -115,7 +115,7 @@ export default function DepositPage() {
               </label>
               {selectedPlan && (
                 <p className="plan-hint">
-                  {selectedPlan.rewardRate}% {selectedPlan.rewardFrequency.toLowerCase()} reward.
+                  {Number(selectedPlan.rewardRate)}% {selectedPlan.rewardFrequency.toLowerCase()} reward.
                   {selectedPlan.description ? ` ${selectedPlan.description}` : ''}
                 </p>
               )}
