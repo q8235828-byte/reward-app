@@ -42,6 +42,13 @@ async function register({
   const existingPhone = await userRepository.findByPhone(pool, normalizedPhone);
   if (existingPhone) throw new AppError(409, 'Phone number is already registered.', 'PHONE_TAKEN');
 
+  // ADMIN_PHONE bootstrap (see config/env.js) - whoever registers with that
+  // exact phone number becomes SUPER_ADMIN immediately, no manual SQL
+  // needed. An already-registered match is instead caught by the startup
+  // check in server.js.
+  const adminPhone = env.admin.phone ? normalizePhone(env.admin.phone) : null;
+  const role = adminPhone && normalizedPhone === adminPhone ? 'SUPER_ADMIN' : 'USER';
+
   let referredBy = null;
   let usedReferralCode = null;
   if (referralCode) {
@@ -64,6 +71,7 @@ async function register({
       passwordHash,
       referralCode: newReferralCode,
       referredBy,
+      role,
     });
     await walletRepository.createWallet(connection, userId);
 

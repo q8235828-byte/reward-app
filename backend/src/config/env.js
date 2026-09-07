@@ -56,6 +56,13 @@ module.exports = {
   cron: {
     secret: getEnv('CRON_SECRET'),
   },
+  admin: {
+    // Optional. Whoever registers with this phone number (or already has,
+    // per the startup check in server.js) is granted SUPER_ADMIN - lets an
+    // operator bootstrap the first admin account purely through hosting
+    // env vars, without hand-writing SQL against the live database.
+    phone: getEnv('ADMIN_PHONE', null),
+  },
   sms: {
     // No SMS gateway is wired up out of the box - there's nowhere for
     // real credentials to come from without the user picking a provider

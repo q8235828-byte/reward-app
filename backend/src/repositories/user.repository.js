@@ -61,14 +61,23 @@ async function referralCodeExists(conn, referralCode) {
 }
 
 async function createUser(conn, {
-  fullName, phone, passwordHash, referralCode, referredBy,
+  fullName, phone, passwordHash, referralCode, referredBy, role = 'USER',
 }) {
   const [result] = await conn.query(
     `INSERT INTO users (full_name, phone, password_hash, referral_code, referred_by, role, status)
-     VALUES (?, ?, ?, ?, ?, 'USER', 'ACTIVE')`,
-    [fullName, phone, passwordHash, referralCode, referredBy],
+     VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE')`,
+    [fullName, phone, passwordHash, referralCode, referredBy, role],
   );
   return result.insertId;
+}
+
+// Used only by the ADMIN_PHONE bootstrap (see server.js and
+// auth.service.js#register) - grants a role by phone number without
+// needing the target user's id. A no-op (0 rows affected) if no user with
+// that phone exists yet, which is fine - the register()-time check covers
+// that case when they do sign up.
+async function promoteByPhone(conn, phone, role) {
+  await conn.query('UPDATE users SET role = ? WHERE phone = ?', [role, phone]);
 }
 
 async function updateLastLogin(conn, userId) {
@@ -111,6 +120,7 @@ module.exports = {
   updateStatus,
   referralCodeExists,
   createUser,
+  promoteByPhone,
   updateLastLogin,
   updatePasswordHash,
   incrementTokenVersion,
