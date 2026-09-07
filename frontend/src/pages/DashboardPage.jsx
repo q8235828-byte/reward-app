@@ -8,17 +8,33 @@ import {
 
 export default function DashboardPage() {
   const [wallet, setWallet] = useState(null);
+  const [referralStats, setReferralStats] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
-    api.get('/wallet')
-      .then((res) => { if (active) setWallet(res.data.wallet); })
+    Promise.all([api.get('/wallet'), api.get('/referrals/stats')])
+      .then(([walletRes, referralRes]) => {
+        if (!active) return;
+        setWallet(walletRes.data.wallet);
+        setReferralStats(referralRes.data.stats);
+      })
       .catch((err) => { if (active) setError(err.message); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(referralStats.referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   if (loading) return <p>Loading…</p>;
   if (error) return <p className="form-error">{error}</p>;
@@ -28,6 +44,15 @@ export default function DashboardPage() {
       <section className="balance-card">
         <span className="balance-label">Available to withdraw</span>
         <span className="balance-amount">{formatCurrency(wallet.withdrawableBalance)}</span>
+      </section>
+
+      <section className="referral-code-card">
+        <span className="referral-code-label">Your referral code</span>
+        <span className="referral-code">{referralStats.referralCode}</span>
+        <div className="referral-link-row">
+          <input readOnly value={referralStats.referralLink} />
+          <button type="button" onClick={handleCopy}>{copied ? 'Copied!' : 'Copy'}</button>
+        </div>
       </section>
 
       <section className="stat-grid">
