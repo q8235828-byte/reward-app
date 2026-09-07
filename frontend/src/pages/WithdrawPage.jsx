@@ -2,13 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency, formatDate } from '../utils/format';
+import { formatCurrency, formatDate, formatPakistanTime } from '../utils/format';
+import Countdown from '../components/Countdown';
+import { ClockIcon, GiftIcon } from '../components/icons';
+
+const INTERVAL_LABEL = {
+  DAILY: 'Every 24 Hours',
+  WEEKLY: 'Every 7 Days',
+  MONTHLY: 'Every 30 Days',
+};
 
 export default function WithdrawPage() {
   const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [settings, setSettings] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [activePlans, setActivePlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
@@ -20,11 +29,17 @@ export default function WithdrawPage() {
 
   const loadData = () => {
     setLoading(true);
-    Promise.all([api.get('/wallet'), api.get('/settings'), api.get('/withdrawals?pageSize=10')])
-      .then(([walletRes, settingsRes, withdrawalsRes]) => {
+    Promise.all([
+      api.get('/wallet'),
+      api.get('/settings'),
+      api.get('/withdrawals?pageSize=10'),
+      api.get('/plans/mine/active'),
+    ])
+      .then(([walletRes, settingsRes, withdrawalsRes, activePlansRes]) => {
         setWallet(walletRes.data.wallet);
         setSettings(settingsRes.data.settings);
         setWithdrawals(withdrawalsRes.data.items);
+        setActivePlans(activePlansRes.data.plans);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -80,6 +95,86 @@ export default function WithdrawPage() {
         <span className="balance-label">Available to withdraw</span>
         <span className="balance-amount">{formatCurrency(wallet.withdrawableBalance)}</span>
       </section>
+
+      {activePlans.length > 0 && (
+        <section className="history-section">
+          <h2>Your active plans</h2>
+          <div className="active-plan-grid">
+            {activePlans.map((plan) => (
+              <div className="active-plan-card" key={plan.userPlanId}>
+                <div className="active-plan-head">
+                  <div>
+                    <span className="active-plan-name">{plan.planName}</span>
+                    <span className="status-badge status-badge-interval">
+                      <ClockIcon size={12} /> {INTERVAL_LABEL[plan.rewardFrequency] || plan.rewardFrequency}
+                    </span>
+                  </div>
+                  <span className="status-badge status-active">Active</span>
+                </div>
+
+                <div className="active-plan-info-grid">
+                  <div className="active-plan-info-row">
+                    <span>Invested amount</span>
+                    <strong>{formatCurrency(plan.investedAmount)}</strong>
+                  </div>
+                  <div className="active-plan-info-row">
+                    <span>Time passed</span>
+                    <strong>{plan.timePassedDays}d {plan.timePassedHours}h</strong>
+                  </div>
+                  <div className="active-plan-info-row">
+                    <span>Time remaining</span>
+                    <strong>
+                      {plan.timeRemainingDays !== null ? `${plan.timeRemainingDays}d ${plan.timeRemainingHours}h` : 'Indefinite'}
+                    </strong>
+                  </div>
+                  <div className="active-plan-info-row">
+                    <span>Progress</span>
+                    <strong>{plan.progressPercent !== null ? `${plan.progressPercent.toFixed(1)}%` : '—'}</strong>
+                  </div>
+                </div>
+
+                <div className="active-plan-profit">
+                  <GiftIcon size={16} />
+                  Profit received: <strong>{formatCurrency(plan.profitReceived)}</strong>
+                  <small>
+                    {plan.cyclesCompleted} / {plan.totalCycles || '∞'} cycles completed
+                  </small>
+                </div>
+
+                {plan.progressPercent !== null && (
+                  <div>
+                    <div className="active-plan-progress-label">
+                      <small>Overall progress</small>
+                      <small>{plan.progressPercent.toFixed(1)}%</small>
+                    </div>
+                    <div className="progress-bar">
+                      <div className="progress-bar-fill" style={{ width: `${plan.progressPercent}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="active-plan-progress-label">
+                    <small>Current cycle progress</small>
+                    <small>{plan.cycleProgressPercent.toFixed(1)}%</small>
+                  </div>
+                  <div className="progress-bar">
+                    <div className="progress-bar-fill" style={{ width: `${plan.cycleProgressPercent}%` }} />
+                  </div>
+                  <small className="active-plan-next-hint">
+                    Next reward eligible in <Countdown target={plan.nextRewardAt} />
+                  </small>
+                </div>
+
+                <div className="active-plan-next-box">
+                  <span>Next reward (Pakistan Time)</span>
+                  <strong>{formatPakistanTime(plan.nextRewardAt)}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <p className="withdrawal-limits">
         Min {formatCurrency(settings.minimumWithdrawal)} · Max {formatCurrency(settings.maximumWithdrawal)}

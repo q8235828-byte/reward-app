@@ -14,3 +14,13 @@ export function formatDate(value) {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }
+
+// Forces the Asia/Karachi timezone regardless of the viewer's own device
+// timezone - used where the UI explicitly labels a time as "(Pakistan
+// Time)" (next reward time on WithdrawPage), so the label stays accurate.
+export function formatPakistanTime(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleString('en-PK', {
+    timeZone: 'Asia/Karachi', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+}
