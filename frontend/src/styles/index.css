@@ -269,6 +269,11 @@
     @apply px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-lg bg-slate-50
       focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-100;
   }
+  .receipt-upload-row { @apply flex items-center gap-3 flex-wrap; }
+  .receipt-upload-row input[type='file'] { @apply text-xs text-slate-600; }
+  .receipt-preview {
+    @apply mt-1.5 max-h-40 w-auto rounded-lg border border-slate-200 object-contain;
+  }
 
   .withdrawal-limits { @apply text-sm text-slate-500 font-medium -mt-2 mb-4; }
   .eligibility-notice {
@@ -592,6 +597,10 @@
   .admin-table td { @apply px-4 py-2.5 text-left border-b border-slate-200 font-medium dark:border-slate-800 dark:text-slate-200; }
   .admin-table tbody tr:last-child td { @apply border-b-0; }
   .admin-table tbody tr:hover { @apply bg-slate-50 dark:bg-slate-800/50; }
+  .admin-receipt-thumb {
+    @apply h-10 w-10 rounded-lg border border-slate-200 object-cover transition
+      hover:scale-150 hover:shadow-lg dark:border-slate-700;
+  }
 
   .setting-description { @apply block text-xs text-slate-500 font-medium mt-0.5; }
 }

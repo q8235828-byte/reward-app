@@ -63,7 +63,7 @@ export default function AdminDepositsPage() {
         <div className="admin-table-wrapper">
           <table className="admin-table">
             <thead>
-              <tr><th>User</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th><th>Date</th><th /></tr>
+              <tr><th>User</th><th>Amount</th><th>Method</th><th>Reference</th><th>Receipt</th><th>Status</th><th>Date</th><th /></tr>
             </thead>
             <tbody>
               {items.map((d) => (
@@ -72,6 +72,13 @@ export default function AdminDepositsPage() {
                   <td>{formatCurrency(d.amount)}</td>
                   <td>{d.paymentMethod}</td>
                   <td>{d.transactionReference || '—'}</td>
+                  <td>
+                    {d.receiptImage ? (
+                      <a href={d.receiptImage} target="_blank" rel="noopener noreferrer" title="View full receipt">
+                        <img src={d.receiptImage} alt="Receipt" className="admin-receipt-thumb" />
+                      </a>
+                    ) : '—'}
+                  </td>
                   <td><span className={`status-badge status-${d.status.toLowerCase()}`}>{d.status}</span></td>
                   <td>{formatDate(d.createdAt)}</td>
                   <td>

@@ -142,6 +142,10 @@ CREATE TABLE IF NOT EXISTS deposits (
   amount DECIMAL(14,2) NOT NULL,
   payment_method ENUM('JAZZCASH','EASYPAISA') NOT NULL,
   transaction_reference VARCHAR(100) DEFAULT NULL,
+  -- Base64 data URI of a photo/screenshot of the payment receipt, uploaded
+  -- by the user as proof of payment (same storage approach as the
+  -- app_settings.logo_url upload - no disk storage on shared hosting).
+  receipt_image MEDIUMTEXT DEFAULT NULL,
   status ENUM('PENDING','UNDER_REVIEW','APPROVED','REJECTED','CANCELLED') NOT NULL DEFAULT 'PENDING',
   admin_note TEXT,
   verified_by BIGINT UNSIGNED DEFAULT NULL,
@@ -277,5 +281,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   KEY idx_audit_logs_target (target_type, target_id),
   CONSTRAINT fk_audit_logs_admin FOREIGN KEY (admin_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- Upgrade path for databases that imported this schema before
+-- deposits.receipt_image existed. Safe to re-run (IF NOT EXISTS).
+-- ---------------------------------------------------------------------
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS receipt_image MEDIUMTEXT DEFAULT NULL AFTER transaction_reference;
 
 SET FOREIGN_KEY_CHECKS = 1;

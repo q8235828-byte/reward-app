@@ -1,7 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/format';
+
+const MAX_RECEIPT_BYTES = 3 * 1024 * 1024;
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function DepositPage() {
   const [searchParams] = useSearchParams();
@@ -21,6 +32,9 @@ export default function DepositPage() {
   const [referenceInput, setReferenceInput] = useState('');
   const [referenceSubmitting, setReferenceSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [receiptImage, setReceiptImage] = useState('');
+  const [receiptError, setReceiptError] = useState('');
+  const receiptInputRef = useRef(null);
 
   const loadData = () => {
     setLoading(true);
@@ -72,6 +86,27 @@ export default function DepositPage() {
     }
   };
 
+  const handleReceiptFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setReceiptError('');
+    if (!file.type.startsWith('image/')) {
+      setReceiptError('Please choose an image file.');
+      return;
+    }
+    if (file.size > MAX_RECEIPT_BYTES) {
+      setReceiptError('Receipt image must be smaller than 3 MB.');
+      return;
+    }
+    const dataUrl = await readFileAsDataUrl(file);
+    setReceiptImage(dataUrl);
+  };
+
+  const removeReceipt = () => {
+    setReceiptImage('');
+    if (receiptInputRef.current) receiptInputRef.current.value = '';
+  };
+
   const handleSubmitReference = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -79,9 +114,11 @@ export default function DepositPage() {
     try {
       const res = await api.post(`/deposits/${activeDeposit.id}/reference`, {
         transactionReference: referenceInput,
+        ...(receiptImage ? { receiptImage } : {}),
       });
       setActiveDeposit(res.data.deposit);
       setReferenceInput('');
+      removeReceipt();
       loadData();
     } catch (err) {
       setFormError(err.message);
@@ -180,6 +217,25 @@ export default function DepositPage() {
                       minLength={4}
                     />
                   </label>
+                  <label>
+                    Payment receipt (optional)
+                    <div className="receipt-upload-row">
+                      <input
+                        ref={receiptInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleReceiptFile}
+                      />
+                      {receiptImage && (
+                        <button type="button" className="link-button" onClick={removeReceipt}>Remove</button>
+                      )}
+                    </div>
+                    {receiptImage && (
+                      <img src={receiptImage} alt="Receipt preview" className="receipt-preview" />
+                    )}
+                    {receiptError && <span className="form-error">{receiptError}</span>}
+                    <span className="setting-description">Upload a screenshot or photo of your payment as proof, under 3 MB.</span>
+                  </label>
                   {formError && <p className="form-error">{formError}</p>}
                   <button type="submit" disabled={referenceSubmitting}>
                     {referenceSubmitting ? 'Submitting…' : 'Submit reference'}
@@ -190,7 +246,11 @@ export default function DepositPage() {
               <button
                 type="button"
                 className="link-button"
-                onClick={() => { setActiveDeposit(null); setPaymentInstructions(null); }}
+                onClick={() => {
+                  setActiveDeposit(null);
+                  setPaymentInstructions(null);
+                  removeReceipt();
+                }}
               >
                 Start a new deposit
               </button>

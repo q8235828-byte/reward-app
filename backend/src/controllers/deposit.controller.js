@@ -25,6 +25,7 @@ async function submitReference(req, res, next) {
       userId: req.user.id,
       depositId,
       transactionReference: req.body.transactionReference,
+      receiptImage: req.body.receiptImage,
     });
     res.status(200).json({
       success: true,

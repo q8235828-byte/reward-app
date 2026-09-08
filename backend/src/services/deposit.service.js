@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
 const AppError = require('../utils/AppError');
 
 async function createDeposit({
-  userId, planId, amount, paymentMethod, transactionReference,
+  userId, planId, amount, paymentMethod, transactionReference, receiptImage,
 }) {
   const plan = await planService.getActivePlanById(planId);
   planService.validateDepositAmount(plan, amount);
@@ -23,6 +23,7 @@ async function createDeposit({
     paymentMethod,
     transactionReference: transactionReference || null,
     status,
+    receiptImage: receiptImage || null,
   });
 
   logger.info('DEPOSIT_CREATED', {
@@ -36,7 +37,9 @@ async function createDeposit({
   };
 }
 
-async function submitTransactionReference({ userId, depositId, transactionReference }) {
+async function submitTransactionReference({
+  userId, depositId, transactionReference, receiptImage,
+}) {
   const deposit = await depositRepository.findById(pool, depositId);
   if (!deposit || deposit.user_id !== userId) {
     throw new AppError(404, 'Deposit not found.', 'DEPOSIT_NOT_FOUND');
@@ -45,7 +48,9 @@ async function submitTransactionReference({ userId, depositId, transactionRefere
     throw new AppError(400, 'This deposit can no longer be updated.', 'DEPOSIT_NOT_EDITABLE');
   }
 
-  await depositRepository.updateTransactionReference(pool, depositId, transactionReference, 'UNDER_REVIEW');
+  await depositRepository.updateTransactionReference(
+    pool, depositId, transactionReference, 'UNDER_REVIEW', receiptImage,
+  );
   const updated = await depositRepository.findById(pool, depositId);
   return depositRepository.sanitizeDeposit(updated);
 }

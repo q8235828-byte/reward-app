@@ -32,10 +32,12 @@ app.use(helmet());
 // pinned to APP_URL rather than left permissive.
 app.use(cors({ origin: env.appUrl, credentials: true }));
 
-// 2mb (not the default 100kb) because the admin settings PATCH can carry a
-// base64-encoded logo upload in one of its fields (see logo_url setting).
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+// 6mb (not the default 100kb) because the admin settings PATCH can carry a
+// base64-encoded logo upload, and deposit creation/reference submission can
+// carry a base64-encoded payment receipt image (up to ~3MB binary / ~4.2M
+// base64 chars, see deposit.validator.js).
+app.use(express.json({ limit: '6mb' }));
+app.use(express.urlencoded({ extended: true, limit: '6mb' }));
 app.use(cookieParser());
 
 app.use('/api/health', healthRoutes);

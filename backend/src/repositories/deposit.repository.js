@@ -1,10 +1,10 @@
 async function create(conn, {
-  userId, planId, amount, paymentMethod, transactionReference, status,
+  userId, planId, amount, paymentMethod, transactionReference, status, receiptImage,
 }) {
   const [result] = await conn.query(
-    `INSERT INTO deposits (user_id, plan_id, amount, payment_method, transaction_reference, status)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [userId, planId, amount, paymentMethod, transactionReference, status],
+    `INSERT INTO deposits (user_id, plan_id, amount, payment_method, transaction_reference, status, receipt_image)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [userId, planId, amount, paymentMethod, transactionReference, status, receiptImage || null],
   );
   return result.insertId;
 }
@@ -21,7 +21,14 @@ async function getForUpdate(conn, id) {
   return rows[0] || null;
 }
 
-async function updateTransactionReference(conn, id, transactionReference, status) {
+async function updateTransactionReference(conn, id, transactionReference, status, receiptImage) {
+  if (receiptImage) {
+    await conn.query(
+      'UPDATE deposits SET transaction_reference = ?, status = ?, receipt_image = ? WHERE id = ?',
+      [transactionReference, status, receiptImage, id],
+    );
+    return;
+  }
   await conn.query(
     'UPDATE deposits SET transaction_reference = ?, status = ? WHERE id = ?',
     [transactionReference, status, id],
@@ -112,6 +119,7 @@ function sanitizeDeposit(row) {
     amount: row.amount,
     paymentMethod: row.payment_method,
     transactionReference: row.transaction_reference,
+    receiptImage: row.receipt_image,
     status: row.status,
     adminNote: row.admin_note,
     verifiedBy: row.verified_by,
